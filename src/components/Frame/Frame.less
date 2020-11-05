@@ -1,0 +1,35 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    h1 {
+        color: #ffffff;
+        font-family: "serif", "sans-serif", "cursive", "fantasy", "monospace";
+        letter-spacing: 2px;
+        font-weight: 500;
+    }
+    .login-section{
+        font-size: 16px;
+        .user-logo{
+            font-size: 20px;
+            color: @primary-color;
+            padding: 0 15px;
+        }
+        .user-name{
+            color: @primary-color;
+            padding: 0 15px 0 0;
+        }
+        .user-logoff{
+            color: #eeeeee;
+            &:hover{
+                color: @primary-color;
+            }
+        }
+    }
+}
+
+
+// extra
+.ant-layout-sider{
+    background: #ffffff;
+}
+// .ant-layout-sider-trigger
