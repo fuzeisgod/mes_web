@@ -65,7 +65,7 @@ export default function Frame(props) {
                             }
                         </Menu>
                     </Sider>
-                    <Layout style={{ padding: '0 24px 24px 174px' }}>
+                    <Layout style={!collapsed ? { padding: '16px 16px 0 166px' } : { padding: '16px 16px 16px 96px' }}>
                         <Content>
                             {props.children}
                         </Content>

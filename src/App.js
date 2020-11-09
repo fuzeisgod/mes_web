@@ -19,6 +19,7 @@ function App() {
                   path={route.pathName}
                   key={route.pathName}
                   component={route.component}
+                  exact={route.exact}
                 />
               ))
             }
