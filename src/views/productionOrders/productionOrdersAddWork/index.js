@@ -109,6 +109,7 @@ export default function ProductionOrdersAddWork(props) {
                 </div>
                 <Card
                     title="工单配置"
+                    bodyStyle={{ padding: '6px 16px 14px 16px', background: '#fafafa' }}
                     extra={
                         <Space size={16}>
                             <Button type="primary" shape="round">提交保存</Button>
@@ -119,13 +120,13 @@ export default function ProductionOrdersAddWork(props) {
                     <Row gutter={16}>
                         <Col span={18}>
                             <Space direction="vertical" size={16} style={{ width: '100%' }}>
-                                <Card>
+                                <Card title="条码参数">
                                     <Form
                                         layout="inline"
                                         onFinish={create_barcode}
                                     >
                                         <Form.Item label="设备类别" name="device_type">
-                                            <Select style={{ width: '120px' }}>
+                                            <Select style={{ width: '200px' }}>
                                                 <Select.Option value="1">1</Select.Option>
                                                 <Select.Option value="2">2</Select.Option>
                                             </Select>

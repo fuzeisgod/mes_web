@@ -75,6 +75,7 @@ export default function ProductionOrders(props) {
                 <Card
                     title="生产订单列表"
                     loading={false}
+                    bodyStyle={{ background: '#fafafa' }}
                     extra={
                         <Button icon={<PlusOutlined />} shape="round" type="primary" onClick={add_new_order}>添加新订单</Button>
                     }

@@ -45,6 +45,7 @@ export default function ProductionOrdersAdd(props) {
                 <Card
                     title="添加新订单"
                     loading={false}
+                    bodyStyle={{ background: '#fafafa' }}
                     extra={
                         <Space size={16}>
                             <Button type="primary" shape="round">提交保存</Button>
