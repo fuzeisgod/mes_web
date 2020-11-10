@@ -7,7 +7,9 @@ import {
     DatePicker,
     Select,
     Divider,
-    Table
+    Table,
+    Breadcrumb,
+    Space
 } from 'antd'
 import {
     PlusOutlined
@@ -24,7 +26,7 @@ export default function ProductionOrders(props) {
     }
 
     const add_new_order = () => {
-        props.history.push('/:userID/po/add')
+        props.history.push('/:userID/po/edit_order')
     }
 
     const columns = [
@@ -61,44 +63,54 @@ export default function ProductionOrders(props) {
 
     return (
         <>
-            <Card
-                title="生产订单列表"
-                loading={false}
-                extra={
-                    <Button icon={<PlusOutlined />} shape="round" type="primary" onClick={add_new_order}>添加新订单</Button>
-                }
-            >
-                <Form
-                    form={form}
-                    onFinish={onFinish}
-                    layout="inline"
+            <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                <div className="bread-area">
+                    <div style={{ paddingRight: '5px' }}>当前路径：</div>
+                    <Breadcrumb separator=">">
+                        <Breadcrumb.Item>
+                            <span className="bread-item">生产订单列表</span>
+                        </Breadcrumb.Item>
+                    </Breadcrumb>
+                </div>
+                <Card
+                    title="生产订单列表"
+                    loading={false}
+                    extra={
+                        <Button icon={<PlusOutlined />} shape="round" type="primary" onClick={add_new_order}>添加新订单</Button>
+                    }
                 >
-                    <Form.Item label="订单编号" name="order_num">
-                        <Input placeholder="请输入订单编号" />
-                    </Form.Item>
-                    <Form.Item label="订单时间" name="order_time">
-                        <RangePicker />
-                    </Form.Item>
-                    <Form.Item label="订单责任人" name="order_response">
-                        <Select style={{ width: '120px' }}>
-                            <Select.Option value="zhangsan">张三</Select.Option>
-                            <Select.Option value="lisi">李四</Select.Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            查询
+                    <Form
+                        form={form}
+                        onFinish={onFinish}
+                        layout="inline"
+                    >
+                        <Form.Item label="订单编号" name="order_num">
+                            <Input placeholder="请输入订单编号" />
+                        </Form.Item>
+                        <Form.Item label="订单时间" name="order_time">
+                            <RangePicker />
+                        </Form.Item>
+                        <Form.Item label="订单责任人" name="order_response">
+                            <Select style={{ width: '120px' }}>
+                                <Select.Option value="zhangsan">张三</Select.Option>
+                                <Select.Option value="lisi">李四</Select.Option>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit">
+                                查询
                         </Button>
-                    </Form.Item>
-                </Form>
-                <Divider />
-                <Table
-                    bordered={true}
-                    columns={columns}
-                    expandable={{ expandedRowRender }}
-                    dataSource={data}
-                />
-            </Card>
+                        </Form.Item>
+                    </Form>
+                    <Divider />
+                    <Table
+                        bordered={true}
+                        columns={columns}
+                        expandable={{ expandedRowRender }}
+                        dataSource={data}
+                    />
+                </Card>
+            </Space>
         </>
     )
 }

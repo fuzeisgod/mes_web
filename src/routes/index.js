@@ -4,7 +4,8 @@ import {
     integrated_configuration,
     orders_standingBook,
     staff_management,
-    production_orders_add
+    production_orders_add,
+    production_orders_add_work
 } from '../views'
 
 import {
@@ -61,8 +62,13 @@ const adminRoutes = [
         exact: true
     },
     {
-        pathName: '/:userID/po/add',
-        component: production_orders_add
+        pathName: '/:userID/po/edit_order',
+        component: production_orders_add,
+        exact: true
+    },
+    {
+        pathName: '/:userID/po/edit_order/edit_work',
+        component: production_orders_add_work
     }
 ]
 
