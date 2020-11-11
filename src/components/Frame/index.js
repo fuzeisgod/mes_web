@@ -8,7 +8,7 @@ import { adminRoutes } from '../../routes'
 import { useHistory } from 'react-router-dom'
 
 const { Header, Content, Sider } = Layout
-
+const { SubMenu } = Menu;
 export default function Frame(props) {
 
     const [collapsed, setCollapsed] = useState(false)
@@ -53,13 +53,30 @@ export default function Frame(props) {
                             {
                                 adminRoutes.map(route => {
                                     return route.isNav && (
-                                        <Menu.Item
-                                            key={route.pathName}
-                                            icon={<route.icon style={{ fontSize: '16px' }} />}
-                                            onClick={() => { history.push(route.pathName) }}
-                                        >
-                                            {route.title}
-                                        </Menu.Item>
+                                        route.isSubMenu ?
+                                            <SubMenu
+                                                title={route.title}
+                                                icon={<route.icon style={{ fontSize: '16px' }} />}
+                                            >
+                                                {
+                                                    route.subMenu.map(subRoute => (
+                                                        <Menu.Item
+                                                            key={subRoute.pathName}
+                                                            onClick={() => { history.push(subRoute.pathName) }}
+                                                        >
+                                                            {subRoute.title}
+                                                        </Menu.Item>
+                                                    ))
+                                                }
+                                            </SubMenu>
+                                            :
+                                            <Menu.Item
+                                                key={route.pathName}
+                                                icon={<route.icon style={{ fontSize: '16px' }} />}
+                                                onClick={() => { history.push(route.pathName) }}
+                                            >
+                                                {route.title}
+                                            </Menu.Item>
                                     )
                                 })
                             }

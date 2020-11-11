@@ -15,12 +15,22 @@ function App() {
           <Switch>
             {
               adminRoutes.map(route => (
-                <Route
-                  path={route.pathName}
-                  key={route.pathName}
-                  component={route.component}
-                  exact={route.exact}
-                />
+                route.isSubMenu ?
+                  route.subMenu.map(subRoute => (
+                    <Route
+                      path={subRoute.pathName}
+                      key={subRoute.pathName}
+                      component={subRoute.component}
+                      exact={subRoute.exact}
+                    />
+                  ))
+                  :
+                  <Route
+                    path={route.pathName}
+                    key={route.pathName}
+                    component={route.component}
+                    exact={route.exact}
+                  />
               ))
             }
           </Switch>

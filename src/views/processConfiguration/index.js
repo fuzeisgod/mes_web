@@ -7,38 +7,36 @@ import {
 } from 'antd'
 
 export default function ProcessConfiguration() {
-    const [columns, setColumns] = useState(
-        [
-            { title: '工艺步骤', dataIndex: 'work_step', key: 'work_step' },
-            { title: '模板表格', dataIndex: 'module', key: 'module' },
-            {
-                title: '操作', render: () => (
-                    <Space size={16}>
-                        <Button shape="round" type="primary">编辑</Button>
-                        <Button shape="round" type="default">预览</Button>
-                        <Button shape="round" danger type="primary">删除</Button>
-                    </Space>
-                )
-            },
-        ]
-    )
-    const [dataSource, setDataSource] = useState(
-        [
-            {
-                key: 1,
-                work_step: '下板组装',
-                module: '模板一'
-            },
-            {
-                key: 2,
-                work_step: '上板组装',
-                module: '模板二'
-            }
-        ]
-    )
+    const columns = [
+        { title: '工艺步骤', dataIndex: 'work_step', key: 'work_step' },
+        { title: '模板表格', dataIndex: 'module', key: 'module' },
+        {
+            title: '操作', render: () => (
+                <Space size={16}>
+                    <Button shape="round" type="primary">编辑</Button>
+                    <Button shape="round" type="default">预览</Button>
+                    <Button shape="round" danger type="primary">删除</Button>
+                </Space>
+            )
+        },
+    ]
+
+    const dataSource = [
+        {
+            key: 1,
+            work_step: '下板组装',
+            module: '模板一'
+        },
+        {
+            key: 2,
+            work_step: '上板组装',
+            module: '模板二'
+        }
+    ]
+
 
     const handleAdd = () => {
-        
+
     }
 
     return (

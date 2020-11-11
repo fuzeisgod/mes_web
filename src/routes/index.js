@@ -1,11 +1,12 @@
 import {
     production_orders,
     process_configuration,
-    integrated_configuration,
     orders_standingBook,
     staff_management,
     production_orders_add,
-    production_orders_add_work
+    production_orders_add_work,
+    device_configuration,
+    form_configuration
 } from '../views'
 
 import {
@@ -46,12 +47,26 @@ const adminRoutes = [
         exact: true
     },
     {
-        pathName: '/:userID/ic',
-        component: integrated_configuration,
+        isSubMenu: true,
+        title: '综合配置',
         isNav: true,
         icon: TableOutlined,
-        title: '综合配置',
-        exact: true
+        subMenu: [
+            {
+                pathName: '/:userID/dc',
+                component: device_configuration,
+                isNav: true,
+                title: '设备配置',
+                exact: true
+            },
+            {
+                pathName: '/:userID/fc',
+                component: form_configuration,
+                isNav: true,
+                title: '表单配置',
+                exact: true
+            },
+        ]
     },
     {
         pathName: '/:userID/sm',
