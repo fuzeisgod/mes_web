@@ -5,7 +5,9 @@ import {
     Button,
     DatePicker,
     Input,
-    Select
+    Select,
+    Divider,
+    Table
 } from 'antd'
 
 
@@ -15,6 +17,37 @@ export default function OrdersStandingBook() {
     const search_work = (values) => {
         console.log(values)
     }
+
+    const dataSource = [
+        {
+            key: 1,
+            work_id: 123456,
+            work_name: '表单名称1',
+            work_man: '张三',
+            work_time: '2020年1月1日'
+        },
+        {
+            key: 2,
+            work_id: 123456,
+            work_name: '表单名称2',
+            work_man: '张三',
+            work_time: '2020年1月1日'
+        },
+        {
+            key: 3,
+            work_id: 123456,
+            work_name: '表单名称3',
+            work_man: '张三',
+            work_time: '2020年1月1日'
+        }
+    ]
+
+    const columns = [
+        { title: '工单单号', dataIndex: 'work_id', key: 'work_id' },
+        { title: '表单名称', dataIndex: 'work_name', key: 'work_name' },
+        { title: '填写人员', dataIndex: 'work_man', key: 'work_man' },
+        { title: '填写时间', dataIndex: 'work_time', key: 'work_time' }
+    ]
 
     return (
         <>
@@ -50,6 +83,15 @@ export default function OrdersStandingBook() {
                         </Button>
                     </Form.Item>
                 </Form>
+                <Divider />
+                <Table
+                    dataSource={dataSource}
+                    columns={columns}
+                    bordered
+                    expandable={{
+                        expandedRowRender: record => <p style={{ margin: 0 }}>{record.work_name}</p>,
+                    }}
+                />
             </Card>
         </>
     )

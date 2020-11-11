@@ -109,7 +109,7 @@ export default function ProductionOrdersAddWork(props) {
                 </div>
                 <Card
                     title="工单配置"
-                    bodyStyle={{ padding: '6px 16px 14px 16px', background: '#fafafa' }}
+                    bodyStyle={{ padding: '2px 16px 14px 16px', background: '#fafafa' }}
                     extra={
                         <Space size={16}>
                             <Button type="primary" shape="round">提交保存</Button>
