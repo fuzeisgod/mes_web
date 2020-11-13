@@ -57,6 +57,7 @@ export default function Frame(props) {
                                             <SubMenu
                                                 title={route.title}
                                                 icon={<route.icon style={{ fontSize: '16px' }} />}
+                                                key={route.subMenuKey}
                                             >
                                                 {
                                                     route.subMenu.map(subRoute => (

@@ -51,6 +51,7 @@ const adminRoutes = [
         title: '综合配置',
         isNav: true,
         icon: TableOutlined,
+        subMenuKey: 'sub1',
         subMenu: [
             {
                 pathName: '/:userID/dc',
