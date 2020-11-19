@@ -1,4 +1,5 @@
 import React from 'react'
+import './device_configuration.less'
 import {
     Form,
     Card,
@@ -50,13 +51,13 @@ export default function DeviceConfiguration() {
                 }
             >
                 <Form form={form} layout="vertical">
-                    <Form.Item label="设备类型" name="device_type">
+                    <Form.Item label="设备类型" name="device_type" className="form-item">
                         <Select style={{ width: '200px' }}>
                             <Select.Option value="1">1</Select.Option>
                             <Select.Option value="2">2</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item label="零件列表">
+                    <Form.Item label="零件列表" className="form-item">
                         <Table bordered columns={columns} dataSource={dataSource} />
                     </Form.Item>
                 </Form>
