@@ -6,6 +6,7 @@ import {
 import './Frame.less'
 import { adminRoutes } from '../../routes'
 import { useHistory } from 'react-router-dom'
+import { insertUserId } from '../../tools'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu;
@@ -18,7 +19,10 @@ export default function Frame(props) {
     const onCollapse = collapsed => {
         setCollapsed(collapsed)
     };
-
+    const handleLogOff = () => {
+        // need delete userid here ...
+        history.push('/login')
+    }
     return (
         <div className="Frame-page">
             <Layout style={{ height: '100vh' }}>
@@ -27,7 +31,7 @@ export default function Frame(props) {
                     <div className="login-section">
                         <UserOutlined className="user-logo" />
                         <span className="user-name">欢迎您，管理员！</span>
-                        <Button type="ghost" className="user-logoff">退出登录</Button>
+                        <Button type="ghost" className="user-logoff" onClick={handleLogOff}>退出登录</Button>
                     </div>
                 </Header>
                 <Layout>
@@ -46,7 +50,7 @@ export default function Frame(props) {
                     >
                         <Menu
                             mode="inline"
-                            defaultSelectedKeys={['1']}
+                            selectedKeys={insertUserId(history.location.pathname, ':userID')}
                             defaultOpenKeys={['sub1']}
                             style={{ height: '100%', borderRight: 0, fontSize: '16px' }}
                         >
@@ -63,7 +67,8 @@ export default function Frame(props) {
                                                     route.subMenu.map(subRoute => (
                                                         <Menu.Item
                                                             key={subRoute.pathName}
-                                                            onClick={() => { history.push(subRoute.pathName) }}
+                                                            // you need insert userid here
+                                                            onClick={() => { history.push(insertUserId(subRoute.pathName, 'my-userid')) }}
                                                         >
                                                             {subRoute.title}
                                                         </Menu.Item>
@@ -74,7 +79,7 @@ export default function Frame(props) {
                                             <Menu.Item
                                                 key={route.pathName}
                                                 icon={<route.icon style={{ fontSize: '16px' }} />}
-                                                onClick={() => { history.push(route.pathName) }}
+                                                onClick={() => { history.push(insertUserId(route.pathName, 'my-userid')) }}
                                             >
                                                 {route.title}
                                             </Menu.Item>

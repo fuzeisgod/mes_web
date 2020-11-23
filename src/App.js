@@ -1,16 +1,18 @@
 import './App.less'
-import { Frame } from './components';
-import { Suspense } from 'react'
-
-
+import { Frame, Loading } from './components';
+import { Suspense, useState } from 'react'
 import { adminRoutes } from './routes'
 import { Route, Switch, Redirect } from 'react-router-dom'
+import { insertUserId } from './tools'
 
 function App() {
+  const [isLogin, setIsLogin] = useState(true)
+  
   return (
-    <>
+    isLogin
+      ?
       <Frame>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loading />}>
           <Switch>
             {
               adminRoutes.map(route => (
@@ -32,10 +34,17 @@ function App() {
                   />
               ))
             }
+            <Redirect
+              // you need insert userid here
+              to={insertUserId(adminRoutes[0].pathName, 'my-userid')}
+              from="/"
+              exact />
+            <Redirect to="/404" />
           </Switch>
         </Suspense>
       </Frame>
-    </>
+      :
+      <Redirect to="/login" />
   );
 }
 

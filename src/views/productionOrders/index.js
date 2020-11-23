@@ -26,7 +26,8 @@ export default function ProductionOrders(props) {
     }
 
     const add_new_order = () => {
-        props.history.push('/:userID/po/edit_order')
+        // you need insert userid here
+        props.history.push('/' + 'my-userid' + '/po/edit_order')
     }
 
     const columns = [

@@ -25,7 +25,8 @@ export default function ProductionOrdersAdd(props) {
     ]
 
     const add_new_work = () => {
-        props.history.push('/:userID/po/edit_order/edit_work')
+        // you need add userid here
+        props.history.push('/' + 'my-userid' + '/po/edit_order/edit_work')
     }
 
     return (

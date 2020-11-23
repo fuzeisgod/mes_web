@@ -28,7 +28,7 @@ export default function PreviewForm(props) {
                                 }
                             })()
                         }>
-                            <div className="form_item_area">
+                            <div className={itemProps.item_submit_type === 'upload' ? 'form_item_area_pic' : 'form_item_area'}>
                                 <div className="form_item_label">{itemProps.item_name}:</div>
                                 <div className="form_item_input">
                                     {

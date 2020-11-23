@@ -1,4 +1,5 @@
 import {
+    login,
     production_orders,
     process_configuration,
     orders_standingBook,
@@ -6,7 +7,8 @@ import {
     production_orders_add,
     production_orders_add_work,
     device_configuration,
-    form_configuration
+    form_configuration,
+    not_found
 } from '../views'
 
 import {
@@ -18,7 +20,10 @@ import {
 } from '@ant-design/icons';
 
 const mainRoutes = [
-
+    {
+        pathName: '/login',
+        component: login
+    }
 ]
 
 const adminRoutes = [
@@ -85,6 +90,10 @@ const adminRoutes = [
     {
         pathName: '/:userID/po/edit_order/edit_work',
         component: production_orders_add_work
+    },
+    {
+        pathName: '/404',
+        component: not_found
     }
 ]
 
