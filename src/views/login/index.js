@@ -17,8 +17,8 @@ export default function Login(props) {
         <div className="login-page">
             <div className="login-box">
                 <h1 className="login-title">新图维追溯管理系统</h1>
-                <Form className="login-form" onFinish={handleLogin}>
-                    <Form.Item name="account" style={{paddingBottom:'0px'}}>
+                <Form className="login-form" onFinish={handleLogin} initialValues={{ ['remember']: false }}>
+                    <Form.Item name="account" style={{ paddingBottom: '0px' }}>
                         <Input
                             addonBefore="账号"
                             allowClear
@@ -26,7 +26,7 @@ export default function Login(props) {
                             className="first-input"
                         />
                     </Form.Item>
-                    <Form.Item name="password" style={{paddingTop:'0px'}}>
+                    <Form.Item name="password" style={{ paddingTop: '0px' }}>
                         <Input.Password
                             addonBefore="密码"
                             placeholder="请输入密码"
