@@ -21,7 +21,10 @@ import './production_order_add.less'
 export default function ProductionOrdersAdd(props) {
     const [form] = Form.useForm()
     const columns = [
-        { title: '工单名称', dataIndex: 'work_name', key: 'work_name' }
+        { title: '设备ID', dataIndex: 'device_id', key: 'device_id' },
+        { title: '设备名称', dataIndex: 'device_name', key: 'device_name' },
+        { title: '开始时间', dataIndex: 'device_start_time', key: 'device_start_time' },
+        { title: '计划完成时间', dataIndex: 'device_finish_time', key: 'device_finish_time' },
     ]
 
     const add_new_work = () => {
@@ -36,7 +39,7 @@ export default function ProductionOrdersAdd(props) {
                     <div style={{ paddingRight: '5px' }}>当前路径：</div>
                     <Breadcrumb separator=">">
                         <Breadcrumb.Item>
-                            <span className="bread-item" onClick={() => { props.history.go(-1) }}>生产订单列表</span>
+                            <span className="bread-item" onClick={() => { props.history.go(-1) }}>流水订单列表</span>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
                             <span className="bread-item">订单编辑</span>
@@ -46,7 +49,8 @@ export default function ProductionOrdersAdd(props) {
                 <Card
                     title="添加新订单"
                     loading={false}
-                    bodyStyle={{ background: '#fafafa' }}
+                    // bodyStyle={{ background: '#fafafa' }}
+                    headStyle={{ fontWeight: 'bold' }}
                     extra={
                         <Space size={16}>
                             <Button type="primary" shape="round">提交保存</Button>
@@ -60,9 +64,6 @@ export default function ProductionOrdersAdd(props) {
                     >
                         <Form.Item label="订单编号" name="order_id">
                             <Input placeholder="请输入订单编号" />
-                        </Form.Item>
-                        <Form.Item label="工单数量" name="order_amount">
-                            <InputNumber min={0} defaultValue={0} />
                         </Form.Item>
                         <Form.Item label="开单时间" name="order_start_time">
                             <DatePicker />
@@ -82,8 +83,9 @@ export default function ProductionOrdersAdd(props) {
                     </Form>
                     <Divider />
                     <Card
-                        title="订单包含工单"
-                        extra={<Button type="primary" shape="round" icon={<PlusOutlined />} onClick={add_new_work}>添加新工单</Button>}
+                        title="流水订单包含设备"
+                        headStyle={{ fontWeight: 'bold' }}
+                        extra={<Button type="primary" shape="round" icon={<PlusOutlined />} onClick={add_new_work}>添加新设备</Button>}
                     >
                         <Table
                             bordered={true}

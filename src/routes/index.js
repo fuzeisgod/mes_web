@@ -6,14 +6,13 @@ import {
     staff_management,
     production_orders_add,
     production_orders_add_work,
-    device_configuration,
+    part_configuration,
     form_configuration,
     not_found
 } from '../views'
 
 import {
     SnippetsOutlined,
-    BarsOutlined,
     TableOutlined,
     FileSearchOutlined,
     TeamOutlined
@@ -32,7 +31,7 @@ const adminRoutes = [
         component: production_orders,
         isNav: true,
         icon: SnippetsOutlined,
-        title: '生产订单',
+        title: '流水订单',
         exact: true
     },
     {
@@ -44,14 +43,6 @@ const adminRoutes = [
         exact: true
     },
     {
-        pathName: '/:userID/pc',
-        component: process_configuration,
-        isNav: true,
-        icon: BarsOutlined,
-        title: '流程配置',
-        exact: true
-    },
-    {
         isSubMenu: true,
         title: '综合配置',
         isNav: true,
@@ -60,9 +51,9 @@ const adminRoutes = [
         subMenu: [
             {
                 pathName: '/:userID/dc',
-                component: device_configuration,
+                component: part_configuration,
                 isNav: true,
-                title: '设备配置',
+                title: '零件配置',
                 exact: true
             },
             {
@@ -70,6 +61,13 @@ const adminRoutes = [
                 component: form_configuration,
                 isNav: true,
                 title: '表单配置',
+                exact: true
+            },
+            {
+                pathName: '/:userID/pc',
+                component: process_configuration,
+                isNav: true,
+                title: '岗位配置',
                 exact: true
             },
         ]

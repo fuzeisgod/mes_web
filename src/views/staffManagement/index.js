@@ -99,9 +99,18 @@ export default function StaffManagement() {
                             label="员工岗位"
                             name="staff-station"
                         >
-                            <Select style={{ width: '200px' }} placeholder="请选择岗位">
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                style={{ width: '250px' }}
+                                placeholder="请选择岗位"
+                            >
                                 <Select.Option value="1">岗位1</Select.Option>
                                 <Select.Option value="2">岗位2</Select.Option>
+                                <Select.Option value="3">岗位3</Select.Option>
+                                <Select.Option value="4">岗位4</Select.Option>
+                                <Select.Option value="5">岗位5</Select.Option>
+                                <Select.Option value="6">岗位6</Select.Option>
                             </Select>
                         </Form.Item>
                         <Divider orientation="left">可选分配账号</Divider>

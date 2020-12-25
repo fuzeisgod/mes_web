@@ -21,32 +21,40 @@ export default function OrdersStandingBook() {
     const dataSource = [
         {
             key: 1,
+            order_id: 123456,
             work_id: 123456,
-            work_name: '表单名称1',
-            work_man: '张三',
-            work_time: '2020年1月1日'
+            device_name: '局放',
+            man_name: 'Chen',
+            man_position: '安装',
+            check_time: '2020年1月1日'
         },
         {
             key: 2,
+            order_id: 123456,
             work_id: 123456,
-            work_name: '表单名称2',
-            work_man: '张三',
-            work_time: '2020年1月1日'
+            device_name: '局放',
+            man_name: 'Chen',
+            man_position: '安装',
+            check_time: '2020年1月1日'
         },
         {
             key: 3,
+            order_id: 123456,
             work_id: 123456,
-            work_name: '表单名称3',
-            work_man: '张三',
-            work_time: '2020年1月1日'
+            device_name: '局放',
+            man_name: 'Chen',
+            man_position: '安装',
+            check_time: '2020年1月1日'
         }
     ]
 
     const columns = [
+        { title: '订单编号', dataIndex: 'order_id', key: 'order_id' },
         { title: '工单单号', dataIndex: 'work_id', key: 'work_id' },
-        { title: '表单名称', dataIndex: 'work_name', key: 'work_name' },
-        { title: '填写人员', dataIndex: 'work_man', key: 'work_man' },
-        { title: '填写时间', dataIndex: 'work_time', key: 'work_time' }
+        { title: '设备名称', dataIndex: 'device_name', key: 'device_name' },
+        { title: '填写人员', dataIndex: 'man_name', key: 'man_name' },
+        { title: '岗位', dataIndex: 'man_position', key: 'man_position' },
+        { title: '填写时间', dataIndex: 'check_time', key: 'check_time' }
     ]
 
     return (
@@ -89,7 +97,7 @@ export default function OrdersStandingBook() {
                     columns={columns}
                     bordered
                     expandable={{
-                        expandedRowRender: record => <p style={{ margin: 0 }}>{record.work_name}</p>,
+                        expandedRowRender: record => <p style={{ margin: 0 }}>{ '这里是工单' }</p>,
                     }}
                 />
             </Card>

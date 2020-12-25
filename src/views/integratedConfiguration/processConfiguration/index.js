@@ -3,7 +3,9 @@ import {
     Card,
     Button,
     Table,
-    Space
+    Space,
+    Form,
+    Select
 } from 'antd'
 
 export default function ProcessConfiguration() {
@@ -43,6 +45,7 @@ export default function ProcessConfiguration() {
         <>
             <Card
                 title="流程配置"
+                headStyle={{ fontWeight: 'bold' }}
                 extra={
                     <Space size={16}>
                         <Button type="default" shape="round" onClick={handleAdd}>添加工艺步骤</Button>
@@ -50,7 +53,31 @@ export default function ProcessConfiguration() {
                     </Space>
                 }
             >
-                <Table bordered columns={columns} dataSource={dataSource}></Table>
+                <Form
+                    layout="inline"
+                >
+                    <Form.Item label="选择设备类型">
+                        <Select style={{ width: '120px' }}>
+                            <Select.Option value="1">1</Select.Option>
+                            <Select.Option value="2">2</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="选择岗位">
+                        <Select style={{ width: '120px' }}>
+                            <Select.Option value="1">1</Select.Option>
+                            <Select.Option value="2">2</Select.Option>
+                        </Select>
+                    </Form.Item>
+                </Form>
+                <Card
+                    title="工艺步骤"
+                    bodyStyle={{ padding: 0 }}
+                    bordered={false}
+                    headStyle={{ padding: 0, fontWeight: 'bold' }}
+                >
+                    <Table bordered columns={columns} dataSource={dataSource}></Table>
+                </Card>
+
             </Card>
         </>
     )

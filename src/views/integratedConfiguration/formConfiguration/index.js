@@ -131,7 +131,7 @@ export default function FormConfiguration() {
                                     <Form.Item label="表单名称" name="form_name">
                                         <Input placeholder="请输入表单名称" />
                                     </Form.Item>
-                                    <Form.Item label="所属工种" name="belong_work">
+                                    <Form.Item label="所属岗位" name="belong_work">
                                         <Select style={{ width: '200px' }}>
                                             <Select.Option value="1">1</Select.Option>
                                             <Select.Option value="2">2</Select.Option>
