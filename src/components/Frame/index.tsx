@@ -10,13 +10,13 @@ import { insertUserId } from '../../tools'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu;
-export default function Frame(props) {
+export default function Frame(props: { children: any }) {
 
     const [collapsed, setCollapsed] = useState(false)
 
     const history = useHistory()
 
-    const onCollapse = collapsed => {
+    const onCollapse = (collapsed: boolean) => {
         setCollapsed(collapsed)
     };
     const handleLogOff = () => {

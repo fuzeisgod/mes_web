@@ -5,7 +5,7 @@ import {
 } from 'antd'
 import './not-found.less'
 
-export default function NotFound(props) {
+export default function NotFound(props: any) {
     const back = () => {
         props.history.go(-1)
     }

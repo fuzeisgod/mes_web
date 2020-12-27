@@ -18,7 +18,7 @@ import {
 } from '@ant-design/icons'
 import './production_order_add.less'
 
-export default function ProductionOrdersAdd(props) {
+export default function ProductionOrdersAdd(props: any) {
     const [form] = Form.useForm()
     const columns = [
         { title: '设备ID', dataIndex: 'device_id', key: 'device_id' },

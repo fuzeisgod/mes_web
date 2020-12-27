@@ -14,7 +14,7 @@ import {
 const { RangePicker } = DatePicker;
 
 export default function OrdersStandingBook() {
-    const search_work = (values) => {
+    const search_work = (values: any) => {
         console.log(values)
     }
 
@@ -97,7 +97,7 @@ export default function OrdersStandingBook() {
                     columns={columns}
                     bordered
                     expandable={{
-                        expandedRowRender: record => <p style={{ margin: 0 }}>{ '这里是工单' }</p>,
+                        expandedRowRender: record => <p style={{ margin: 0 }}>{'这里是工单'}</p>,
                     }}
                 />
             </Card>

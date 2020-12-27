@@ -213,7 +213,7 @@ export default function ProductionOrdersAddWork(props) {
                                                     mode="multiple"
                                                     allowClear
                                                     style={{ width: '500px' }}
-                                                    defaultValue={['1','2','3','4','5','6']}
+                                                    defaultValue={['1', '2', '3', '4', '5', '6']}
                                                     placeholder="请选择此设备包含岗位"
                                                 >
                                                     <Select.Option value="1">装配</Select.Option>
@@ -229,7 +229,7 @@ export default function ProductionOrdersAddWork(props) {
                                             title="设备零部件清单"
                                             bodyStyle={{ padding: 0 }}
                                             bordered={false}
-                                            headStyle={{ padding: 0, fontWeight:'bold' }}
+                                            headStyle={{ padding: 0, fontWeight: 'bold' }}
                                         >
                                             <Table columns={columns} dataSource={dataSource} bordered />
                                         </Card>

@@ -11,7 +11,7 @@ import {
     Switch,
     Table
 } from 'antd'
-import { sortableContainer, sortableElement, sortableHandle } from 'react-sortable-hoc'
+import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import arrayMove from 'array-move';
 import './form_configuration.less'
 import { MenuOutlined } from '@ant-design/icons';
@@ -25,12 +25,12 @@ const data = [
     { key: 3, form_item_name: '表单子项3', index: 2 },
 ]
 
-const SortableItem = sortableElement(props => <tr {...props} />);
-const SortableContainer = sortableContainer(props => <tbody {...props} />);
+const SortableItem = SortableElement(props => <tr {...props} />);
+const SortableList = SortableContainer(props => <tbody {...props} />);
 
 export default function FormConfiguration() {
 
-    const DragHandle = sortableHandle(() => (
+    const DragHandle = SortableHandle(() => (
         <MenuOutlined style={{ cursor: 'pointer', color: '#999' }} />
     ));
 
@@ -69,7 +69,7 @@ export default function FormConfiguration() {
     };
 
     const DraggableContainer = props => (
-        <SortableContainer
+        <SortableList
             useDragHandle
             helperClass="row-dragging"
             onSortEnd={onSortEnd}

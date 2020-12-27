@@ -19,9 +19,9 @@ import './production_order.less'
 
 const { RangePicker } = DatePicker
 
-export default function ProductionOrders(props) {
+export default function ProductionOrders(props:any) {
     const [form] = Form.useForm()
-    const onFinish = values => {
+    const onFinish = (values:any) => {
         console.log(values)
     }
 

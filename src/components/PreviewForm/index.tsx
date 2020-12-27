@@ -7,7 +7,7 @@ import {
 } from 'antd'
 import './preview_form.less'
 
-export default function PreviewForm(props) {
+export default function PreviewForm(props:any) {
     console.log(props)
     return (
         <>
@@ -15,7 +15,7 @@ export default function PreviewForm(props) {
             <Divider />
             <div className="form_content">
                 {
-                    props.formItemProps.map((itemProps, index) => (
+                    props.formItemProps.map((itemProps:any, index:number) => (
                         <div className="form_item" key={index} style={
                             (() => {
                                 switch (itemProps.item_span) {

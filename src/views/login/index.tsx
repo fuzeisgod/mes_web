@@ -7,8 +7,8 @@ import {
 } from 'antd'
 import './login.less'
 
-export default function Login(props) {
-    const handleLogin = (values) => {
+export default function Login(props: any) {
+    const handleLogin = (values: any) => {
         console.log(values)
         // need save userid here ...
         props.history.push('/')
