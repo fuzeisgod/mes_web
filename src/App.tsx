@@ -5,13 +5,8 @@ import { adminRoutes } from './routes'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { insertUserId } from './tools'
 
-interface Iprops { }
-
-const App: FC<Iprops> = ({
-
-}): ReactElement => {
-  const [isLogin, setIsLogin] = useState(true)
-
+const App: FC = (): ReactElement => {
+  const [isLogin, setIsLogin] = useState<boolean>(true)
   return (
     isLogin
       ?

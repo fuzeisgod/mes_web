@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC, ReactElement } from 'react'
 import {
     Card,
     Button,
@@ -15,13 +15,14 @@ import {
     PlusOutlined
 } from '@ant-design/icons'
 import './production_order.less'
-
+import { ISearch } from './typings'
+import moment from 'moment';
 
 const { RangePicker } = DatePicker
 
-export default function ProductionOrders(props:any) {
+const ProductionOrders: FC = (props: any): ReactElement => {
     const [form] = Form.useForm()
-    const onFinish = (values:any) => {
+    const onFinish = (values: ISearch) => {
         console.log(values)
     }
 
@@ -50,7 +51,7 @@ export default function ProductionOrders(props:any) {
 
         const data = [
             { key: 0, device_id: '123456', device_name: '接地箱1', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' },
-            { key: 0, device_id: '123456', device_name: '接地箱2', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' }
+            { key: 1, device_id: '123456', device_name: '接地箱2', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' }
         ]
         return <Table bordered={true} columns={columns} dataSource={data} pagination={false} />;
     }
@@ -92,7 +93,12 @@ export default function ProductionOrders(props:any) {
                             <Input placeholder="请输入订单编号" />
                         </Form.Item>
                         <Form.Item label="订单时间" name="order_time">
-                            <RangePicker />
+                            <RangePicker
+                                ranges={{
+                                    '今天': [moment(), moment()],
+                                    '本月': [moment().startOf('month'), moment().endOf('month')],
+                                }}
+                            />
                         </Form.Item>
                         <Form.Item label="订单责任人" name="order_response">
                             <Select style={{ width: '120px' }}>
@@ -118,3 +124,5 @@ export default function ProductionOrders(props:any) {
         </>
     )
 }
+
+export default ProductionOrders;

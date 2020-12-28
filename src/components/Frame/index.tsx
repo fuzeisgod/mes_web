@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, FC, ReactElement } from 'react'
 import { Layout, Menu, Button } from 'antd'
 import {
     UserOutlined
@@ -6,23 +6,29 @@ import {
 import './Frame.less'
 import { adminRoutes } from '../../routes'
 import { useHistory } from 'react-router-dom'
-import { insertUserId } from '../../tools'
+import { insertUserId, cutURLForSelectedKeys } from '../../tools'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu;
-export default function Frame(props: { children: any }) {
 
-    const [collapsed, setCollapsed] = useState(false)
+interface Iprops {
+    children: ReactElement
+}
+
+const Frame: FC<Iprops> = ({ children }): ReactElement => {
+
+    const [collapsed, setCollapsed] = useState<boolean>(false)
 
     const history = useHistory()
 
-    const onCollapse = (collapsed: boolean) => {
+    const onCollapse = (collapsed: boolean): void => {
         setCollapsed(collapsed)
     };
-    const handleLogOff = () => {
+    const handleLogOff = (): void => {
         // need delete userid here ...
         history.push('/login')
     }
+
     return (
         <div className="Frame-page">
             <Layout style={{ height: '100vh' }}>
@@ -50,7 +56,7 @@ export default function Frame(props: { children: any }) {
                     >
                         <Menu
                             mode="inline"
-                            selectedKeys={insertUserId(history.location.pathname, ':userID')}
+                            selectedKeys={[ cutURLForSelectedKeys(insertUserId(history.location.pathname, ':userID')) ]}
                             defaultOpenKeys={['sub1']}
                             style={{ height: '100%', borderRight: 0, fontSize: '16px' }}
                         >
@@ -90,7 +96,7 @@ export default function Frame(props: { children: any }) {
                     </Sider>
                     <Layout style={!collapsed ? { padding: '16px 16px 16px 166px' } : { padding: '16px 16px 16px 96px' }} className="frame-content">
                         <Content>
-                            {props.children}
+                            {children}
                         </Content>
                     </Layout>
                 </Layout>
@@ -98,3 +104,6 @@ export default function Frame(props: { children: any }) {
         </div>
     )
 }
+
+
+export default Frame;

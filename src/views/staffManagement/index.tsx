@@ -1,55 +1,27 @@
-import React from 'react'
+import React, { FC, ReactElement, useReducer, useEffect, useState } from 'react'
 import {
     Tree,
-    Switch,
     Card,
     Tooltip,
     Input,
     Button,
     Form,
     Select,
-    Divider
+    Divider,
+    Empty
 } from 'antd'
 import { FormOutlined, UserOutlined } from '@ant-design/icons';
-import './staff_management.less'
+import './staff_management.less';
+import { ACTION_TYPE, ITree } from './typings';
+import { treeReducer } from './reducer';
 
-const treeData = [
-    {
-        title: '车间A',
-        key: '0-0',
-        children: [
-            {
-                title: '工人1',
-                key: '0-0-0',
-                icon: <UserOutlined />
-            },
-            {
-                title: '工人2',
-                key: '0-0-1',
-                icon: <UserOutlined />
-            }
-        ],
-    },
-    {
-        title: '车间B',
-        key: '0-1',
-        children: [
-            {
-                title: '工人3',
-                key: '0-1-0',
-                icon: <UserOutlined />
-            },
-            {
-                title: '工人4',
-                key: '0-1-1',
-                icon: <UserOutlined />
-            }
-        ],
-    }
-];
+const initialState: ITree = {
+    treeData: []
+};
 
-export default function StaffManagement() {
+const StaffManagement: FC = (): ReactElement => {
     const [form] = Form.useForm()
+
     const onSelect = (selectedKeys, info) => {
         console.log('selected', selectedKeys, info);
     };
@@ -57,6 +29,56 @@ export default function StaffManagement() {
     const handleChange = () => {
         console.log(form.getFieldsValue())
     }
+
+    const [state, dispatch] = useReducer(treeReducer, initialState)
+
+    useEffect(() => {
+        // TODO... get treeData here （result）
+        let result = [
+            {
+                title: '车间A',
+                key: '0-0',
+                children: [
+                    {
+                        title: '工人1',
+                        key: '0-0-0',
+                        id: 1,
+                        icon: <UserOutlined />
+                    },
+                    {
+                        title: '工人2',
+                        key: '0-0-1',
+                        id: 2,
+                        icon: <UserOutlined />
+                    }
+                ],
+            },
+            {
+                title: '车间B',
+                key: '0-1',
+                children: [
+                    {
+                        title: '工人3',
+                        key: '0-1-0',
+                        id: 4,
+                        icon: <UserOutlined />
+                    },
+                    {
+                        title: '工人4',
+                        key: '0-1-1',
+                        id: 5,
+                        icon: <UserOutlined />
+                    }
+                ],
+            }
+        ]
+
+        dispatch({
+            type: ACTION_TYPE.GET_TREE,
+            payload: result
+        })
+
+    }, [])
 
     return (
         <div className="staff-manage-page">
@@ -71,13 +93,19 @@ export default function StaffManagement() {
                         <Input placeholder="请输入员工姓名或工号" />
                     </div>
                     <div className="tree-box">
-                        <Tree
-                            showLine={{ showLeafIcon: false }}
-                            showIcon={true}
-                            defaultExpandAll={true}
-                            onSelect={onSelect}
-                            treeData={treeData}
-                        />
+                        {
+                            state.treeData.length > 0
+                                ?
+                                <Tree
+                                    showLine={{ showLeafIcon: false }}
+                                    showIcon={true}
+                                    defaultExpandAll={true}
+                                    onSelect={onSelect}
+                                    treeData={state.treeData}
+                                />
+                                :
+                                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                        }
                     </div>
                 </Card>
             </div>
@@ -148,3 +176,6 @@ export default function StaffManagement() {
         </div>
     )
 }
+
+
+export default StaffManagement;
