@@ -56,7 +56,7 @@ const Frame: FC<Iprops> = ({ children }): ReactElement => {
                     >
                         <Menu
                             mode="inline"
-                            selectedKeys={[ cutURLForSelectedKeys(insertUserId(history.location.pathname, ':userID')) ]}
+                            selectedKeys={[cutURLForSelectedKeys(insertUserId(history.location.pathname, ':userID'))]}
                             defaultOpenKeys={['sub1']}
                             style={{ height: '100%', borderRight: 0, fontSize: '16px' }}
                         >

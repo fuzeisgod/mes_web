@@ -20,7 +20,8 @@ import {
     PlusOutlined
 } from '@ant-design/icons'
 import './production_order_add_work.less'
-import * as JsBarcode from 'jsbarcode'
+import JsBarcode from 'jsbarcode'
+import { isIFrame } from '../../../tools'
 
 const _barcode_options = {
     format: "CODE128",//选择要使用的条形码类型
@@ -38,12 +39,11 @@ const _barcode_options = {
 
 export default function ProductionOrdersAddWork(props) {
     const [form] = Form.useForm()
-    const refBarContainer = useRef(null)
-    const mainRef = useRef(null)
-    const [isBarcodeExist, setIsBarcodeExist] = useState(false)
+    const refBarContainer = useRef<HTMLCanvasElement>(null)
+    const mainRef = useRef<HTMLDivElement>(null)
+    const [isBarcodeExist, setIsBarcodeExist] = useState<boolean>(false)
 
     const create_barcode = (values) => {
-        console.log(values)
         JsBarcode(refBarContainer.current, '020201112220A001', { ..._barcode_options, text: '02020111 2220A001' })
         setIsBarcodeExist(true)
     }
@@ -118,14 +118,15 @@ export default function ProductionOrdersAddWork(props) {
                 iframe.setAttribute("id", "print-iframe");
                 iframe.setAttribute('style', 'position:absolute;width:0px;height:0px;left:-500px;top:-500px;');
                 document.body.appendChild(iframe);
-                doc = iframe.contentWindow.document;
+                doc = (iframe as HTMLIFrameElement).contentWindow.document;
                 //这里可以自定义样式
                 //doc.write("<LINK rel="stylesheet" type="text/css" href="css/print.css">");
                 doc.write("<img src='" + mainImgSrc + "' />");
                 doc.close();
-                iframe.contentWindow.focus();
+                (iframe as HTMLIFrameElement).contentWindow.focus();
             }
-            iframe.contentWindow.print();
+
+            (iframe as HTMLIFrameElement).contentWindow.print();
             if (navigator.userAgent.indexOf("MSIE") > 0) {
                 document.body.removeChild(iframe);
             }

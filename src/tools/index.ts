@@ -12,3 +12,8 @@ export const cutURLForSelectedKeys = (url: string): string => {
     routeArr.length = 3;
     return routeArr.join('/')
 }
+
+export const isIFrame = (input: HTMLElement | null): input is HTMLIFrameElement => {
+    return input !== null && input.tagName === 'IFRAME';
+}
+    

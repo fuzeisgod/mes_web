@@ -8,9 +8,9 @@ const staff_management = React.lazy(() => import('./staffManagement'))
 const production_orders_add = React.lazy(() => import('./productionOrders/productionOrdersAdd'))
 const not_found = React.lazy(() => import('./notFound'))
 
-const production_orders_add_work = React.lazy(() => import('./productionOrders/productionOrdersAddWork/index.js'))
+const production_orders_add_work = React.lazy(() => import('./productionOrders/productionOrdersAddWork'))
 const part_configuration = React.lazy(() => import('./integratedConfiguration/partConfiguration'))
-const form_configuration = React.lazy(() => import('./integratedConfiguration/formConfiguration/index.js'))
+const form_configuration = React.lazy(() => import('./integratedConfiguration/formConfiguration'))
 
 export {
     login,
