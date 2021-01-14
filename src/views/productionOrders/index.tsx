@@ -32,8 +32,8 @@ const ProductionOrders: FC = (props: any): ReactElement => {
     }
 
     const columns = [
-        { title: '订单编号', dataIndex: 'order_id', key: 'order_id' },
-        { title: '设备数量', dataIndex: 'order_amount', key: 'order_amount' },
+        { title: '生产订单编号', dataIndex: 'order_id', key: 'order_id' },
+        { title: '包含产品数量', dataIndex: 'order_amount', key: 'order_amount' },
         { title: '开单时间', dataIndex: 'order_start_time', key: 'order_start_time' },
         { title: '计划完成时间', dataIndex: 'order_finish_time', key: 'order_finish_time' },
         { title: '是否加急', dataIndex: 'order_in_need', key: 'order_in_need' },
@@ -43,17 +43,18 @@ const ProductionOrders: FC = (props: any): ReactElement => {
 
     const expandedRowRender = () => {
         const columns = [
-            { title: '设备ID', dataIndex: 'device_id', key: 'device_id' },
-            { title: '设备名称', dataIndex: 'device_name', key: 'device_name' },
+            { title: '产品序列号', dataIndex: 'device_id', key: 'device_id' },
+            { title: '产品料号', dataIndex: 'device_type', key: 'device_type' },
+            { title: '产品名称', dataIndex: 'device_name', key: 'device_name' },
             { title: '开始时间', dataIndex: 'device_start_time', key: 'device_start_time' },
             { title: '计划完成时间', dataIndex: 'device_end_time', key: 'device_end_time' },
         ]
 
         const data = [
-            { key: 0, device_id: '123456', device_name: '接地箱1', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' },
-            { key: 1, device_id: '123456', device_name: '接地箱2', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' }
+            { key: 0, device_id: '123456', device_type: '02020103', device_name: '接地箱1', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' },
+            { key: 1, device_id: '123456', device_type: '02020103', device_name: '接地箱2', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' }
         ]
-        return <Table bordered={true} columns={columns} dataSource={data} pagination={false} />;
+        return <Table className="sub-table" bordered={true} columns={columns} dataSource={data} pagination={false} />;
     }
 
 
@@ -71,12 +72,12 @@ const ProductionOrders: FC = (props: any): ReactElement => {
                     <div style={{ paddingRight: '5px' }}>当前路径：</div>
                     <Breadcrumb separator=">">
                         <Breadcrumb.Item>
-                            <span className="bread-item">流水订单列表</span>
+                            <span className="bread-item">生产订单列表</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                 </div>
                 <Card
-                    title="流水订单列表"
+                    title="生产订单列表"
                     loading={false}
                     // bodyStyle={{ background: '#fafafa' }}
                     headStyle={{ fontWeight: 'bold' }}
@@ -89,8 +90,8 @@ const ProductionOrders: FC = (props: any): ReactElement => {
                         onFinish={onFinish}
                         layout="inline"
                     >
-                        <Form.Item label="订单编号" name="order_num">
-                            <Input placeholder="请输入订单编号" />
+                        <Form.Item label="生产订单编号" name="order_num">
+                            <Input placeholder="请输入生产订单编号" />
                         </Form.Item>
                         <Form.Item label="订单时间" name="order_time">
                             <RangePicker
@@ -118,6 +119,11 @@ const ProductionOrders: FC = (props: any): ReactElement => {
                         columns={columns}
                         expandable={{ expandedRowRender }}
                         dataSource={data}
+                        rowClassName={(record, index) => {
+                            let className = 'light-row';
+                            if (index % 2 === 1) className = 'dark-row';
+                            return className;
+                        }}
                     />
                 </Card>
             </Space>

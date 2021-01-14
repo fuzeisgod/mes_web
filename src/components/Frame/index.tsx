@@ -94,7 +94,7 @@ const Frame: FC<Iprops> = ({ children }): ReactElement => {
                             }
                         </Menu>
                     </Sider>
-                    <Layout style={!collapsed ? { padding: '16px 16px 16px 166px' } : { padding: '16px 16px 16px 96px' }} className="frame-content">
+                    <Layout style={!collapsed ? { padding: '10px 16px 0 166px' } : { padding: '10px 16px 0 96px' }} className="frame-content">
                         <Content>
                             {children}
                         </Content>

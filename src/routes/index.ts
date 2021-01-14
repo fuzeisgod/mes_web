@@ -31,7 +31,7 @@ const adminRoutes = [
         component: production_orders,
         isNav: true,
         icon: SnippetsOutlined,
-        title: '流水订单',
+        title: '生产订单',
         exact: true
     },
     {

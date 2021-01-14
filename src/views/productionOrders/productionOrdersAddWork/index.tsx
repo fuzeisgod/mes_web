@@ -140,18 +140,18 @@ export default function ProductionOrdersAddWork(props) {
                     <div style={{ paddingRight: '5px' }}>当前路径：</div>
                     <Breadcrumb>
                         <Breadcrumb.Item>
-                            <span className="bread-item" onClick={() => { props.history.go(-2) }}>流水订单列表</span>
+                            <span className="bread-item" onClick={() => { props.history.go(-2) }}>生产订单列表</span>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
-                            <span className="bread-item" onClick={() => { props.history.go(-1) }}>订单编辑</span>
+                            <span className="bread-item" onClick={() => { props.history.go(-1) }}>生产订单编辑</span>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
-                            <span className="bread-item">设备编辑</span>
+                            <span className="bread-item">产品配置</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                 </div>
                 <Card
-                    title="设备配置"
+                    title="产品配置"
                     bodyStyle={{ padding: '2px 16px 14px 16px', background: '#fafafa' }}
                     headStyle={{ fontWeight: 'bold' }}
                     extra={
@@ -164,24 +164,25 @@ export default function ProductionOrdersAddWork(props) {
                     <Row gutter={16}>
                         <Col span={18}>
                             <Space direction="vertical" size={16} style={{ width: '100%' }}>
-                                <Card title="条码参数" headStyle={{ fontWeight: 'bold' }}>
+                                <Card title="基本信息" headStyle={{ fontWeight: 'bold' }} extra={ <Button type="primary" shape="round" onClick={create_barcode}>生成条形码</Button> }>
                                     <Form
                                         layout="inline"
-                                        onFinish={create_barcode}
                                     >
-                                        <Form.Item label="设备类别" name="device_type">
-                                            <Select style={{ width: '200px' }}>
-                                                <Select.Option value="1">1</Select.Option>
-                                                <Select.Option value="2">2</Select.Option>
-                                            </Select>
+                                        <Form.Item label="产品序列号" name="device_id">
+                                            <Input placeholder="请输入产品序列号" />
                                         </Form.Item>
-                                        <Form.Item label="用友编号" name="friend_id">
-                                            <Input placeholder="请输入用友编号" />
+                                        <Form.Item label="产品料号" name="friend_id">
+                                            <Input placeholder="请输入产品料号" />
                                         </Form.Item>
-                                        <Form.Item>
-                                            <Button type="primary" htmlType="submit">
-                                                生成
-                                        </Button>
+
+                                        <Form.Item label="产品名称" name="device_name">
+                                            <Input placeholder="请输入产品名称" />
+                                        </Form.Item>
+                                        <Form.Item label="开始时间" name="device_start_time">
+                                            <DatePicker />
+                                        </Form.Item>
+                                        <Form.Item label="计划完成时间" name="device_finish_time">
+                                            <DatePicker />
                                         </Form.Item>
                                     </Form>
                                 </Card>
@@ -194,18 +195,6 @@ export default function ProductionOrdersAddWork(props) {
                                             form={form}
                                             layout="inline"
                                         >
-                                            <Form.Item label="设备ID" name="device_id">
-                                                <Input placeholder="请输入设备ID" />
-                                            </Form.Item>
-                                            <Form.Item label="设备名称" name="device_name">
-                                                <Input placeholder="请输入设备名称" />
-                                            </Form.Item>
-                                            <Form.Item label="开始时间" name="device_start_time">
-                                                <DatePicker />
-                                            </Form.Item>
-                                            <Form.Item label="计划完成时间" name="device_finish_time">
-                                                <DatePicker />
-                                            </Form.Item>
                                             <Form.Item
                                                 label="包含岗位"
                                                 name="have_position"
