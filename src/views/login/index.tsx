@@ -1,18 +1,51 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
     Form,
     Input,
     Button,
-    Checkbox
+    Checkbox,
+    message
 } from 'antd'
+import { encryptAES, decryptAES } from '../../tools/aes'
 import './login.less'
+import { login } from '../../api/login'
+
+interface UserInfo {
+    account: string | undefined;
+    password: string | undefined;
+    remember: boolean;
+}
 
 export default function Login(props: any) {
-    const handleLogin = (values: any) => {
-        console.log(values)
-        // need save userid here ...
-        props.history.push('/')
+    const handleLogin = (values: UserInfo) => {
+        let { account, password, remember } = values;
+        if (remember) {
+            localStorage.setItem('user', encryptAES(JSON.stringify({ ac: account, pwd: password })))
+        }
+        login({ ac: encryptAES(account), pwd: encryptAES(password) }).then((res: any) => {
+            if (res.bRes) {
+                localStorage.setItem('key', encryptAES(res.Ticket))
+                props.history.push('/')
+            } else {
+                message.error('login error!');
+            }
+        })
     }
+
+    useEffect(() => {
+        if (localStorage.getItem('user')) {
+            const { ac, pwd } = decryptAES(localStorage.getItem('user'))
+            login({ ac, pwd }).then((res: any) => {
+                if (res.bRes) {
+                    localStorage.setItem('key', encryptAES(res.Ticket))
+                    props.history.push('/')
+                } else {
+                    message.error('login error!');
+                }
+            })
+        }
+    }, [])
+
     return (
         <div className="login-page">
             <div className="login-box">

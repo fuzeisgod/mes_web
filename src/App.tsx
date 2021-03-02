@@ -6,7 +6,8 @@ import { Route, Switch, Redirect } from 'react-router-dom'
 import { insertUserId } from './tools'
 
 const App: FC = (): ReactElement => {
-  const [isLogin, setIsLogin] = useState<boolean>(true)
+  const [isLogin, setIsLogin] = useState<boolean>(localStorage.getItem('key') ? true : false)
+
   return (
     isLogin
       ?

@@ -25,7 +25,8 @@ const Frame: FC<Iprops> = ({ children }): ReactElement => {
         setCollapsed(collapsed)
     };
     const handleLogOff = (): void => {
-        // need delete userid here ...
+        localStorage.removeItem("key")
+        localStorage.removeItem("user")
         history.push('/login')
     }
 

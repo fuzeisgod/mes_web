@@ -1,6 +1,5 @@
 import { ACTION_TYPE, IAction, ITree } from "./typings";
 
-
 function treeReducer(state: ITree, action: IAction): ITree {
     const { type, payload } = action;
 
