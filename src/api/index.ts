@@ -14,9 +14,19 @@ const service2 = axios.create({
 
 service1.interceptors.request.use((config) => {
     if (true) {
-        config.headers['Authorization'] = 'BBasicAuth ' + decryptAES(localStorage.getItem('key')) // 让每个请求携带自定义token 请根据实际情况自行修改
+        config.headers['Authorization'] = 'BasicAuth ' + decryptAES(localStorage.getItem('key')) // 让每个请求携带自定义token 请根据实际情况自行修改
     }
     return config
+})
+
+
+service1.interceptors.response.use((res) => {
+    if (res.status === 200) {
+        return res.data
+    } else {
+        // 全局处理错误
+        message.info('connection timed out!');
+    }
 })
 
 service2.interceptors.response.use((res) => {

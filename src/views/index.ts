@@ -1,6 +1,6 @@
 import React from 'react'
 
-const login = React.lazy(()=>import('./login'))
+const login = React.lazy(() => import('./login'))
 const production_orders = React.lazy(() => import('./productionOrders'))
 const process_configuration = React.lazy(() => import('./integratedConfiguration/processConfiguration'))
 const orders_standingBook = React.lazy(() => import('./ordersStandingBook'))
@@ -10,6 +10,8 @@ const not_found = React.lazy(() => import('./notFound'))
 
 const production_orders_add_work = React.lazy(() => import('./productionOrders/productionOrdersAddWork'))
 const part_configuration = React.lazy(() => import('./integratedConfiguration/partConfiguration'))
+const part_configuration_add = React.lazy(() => import('./integratedConfiguration/partConfiguration/partConfigurationAdd'))
+
 const form_configuration = React.lazy(() => import('./integratedConfiguration/formConfiguration'))
 
 export {
@@ -21,6 +23,7 @@ export {
     production_orders_add,
     production_orders_add_work,
     part_configuration,
+    part_configuration_add,
     form_configuration,
     not_found
 }

@@ -1,4 +1,4 @@
-import React, { FC, ReactElement } from 'react'
+import React, { FC, ReactElement, useEffect, useReducer } from 'react'
 import {
     Card,
     Button,
@@ -17,53 +17,102 @@ import {
 import './production_order.less'
 import { ISearch } from './typings'
 import moment from 'moment';
+import { getProductOrdersList } from '../../api/product'
+import { productOrderListReducer } from './reducer'
+import { ACTION_TYPE } from './typings'
 
 const { RangePicker } = DatePicker
 
 const ProductionOrders: FC = (props: any): ReactElement => {
     const [form] = Form.useForm()
     const onFinish = (values: ISearch) => {
-        console.log(values)
+        let { order_num, order_response, order_time } = values;
+        let startTime = order_time[0].toJSON()
+        let endTime = order_time[1].toJSON()
+        getProductOrdersList({
+            startTime: startTime || "",
+            endTime: endTime || "",
+            orderId: order_num || "",
+            chargeUserId: order_response || ""
+        }).then((res: any) => {
+            if (res.code === 200) {
+                let n = res.data.map(item => ({
+                    ...item,
+                    order_amount: item.Devices.length,
+                    key: item.Id,
+                    isUrgent: item.isUrgent ? '是' : '否'
+                }))
+                dispatch({
+                    type: ACTION_TYPE.SET_ORDER_LIST,
+                    payload: n
+                })
+            }
+        })
     }
+
+    const [state, dispatch] = useReducer(productOrderListReducer, [])
 
     const add_new_order = () => {
         // you need insert userid here
         props.history.push('/' + 'my-userid' + '/po/edit_order')
     }
 
+    const editRender = (record) => {
+        const handleClickEdit = () => {
+            props.history.push('/' + 'my-userid' + '/po/edit_order/?productId=' + record.ProductNo)
+        }
+        return <a onClick={handleClickEdit}>编辑</a>
+    }
+
     const columns = [
-        { title: '生产订单编号', dataIndex: 'order_id', key: 'order_id' },
-        { title: '包含产品数量', dataIndex: 'order_amount', key: 'order_amount' },
-        { title: '开单时间', dataIndex: 'order_start_time', key: 'order_start_time' },
-        { title: '计划完成时间', dataIndex: 'order_finish_time', key: 'order_finish_time' },
-        { title: '是否加急', dataIndex: 'order_in_need', key: 'order_in_need' },
-        { title: '订单负责人', dataIndex: 'order_response_man', key: 'order_response_man' },
-        { title: '操作', key: 'order_action', render: () => (<a>编辑</a>) },
+        { title: '生产订单编号', dataIndex: 'ProductNo', key: 'order_id' },
+        { title: '产品数量', dataIndex: 'order_amount', key: 'order_amount' },
+        { title: '开单时间', dataIndex: 'CreateTime', key: 'order_start_time' },
+        { title: '计划完成时间', dataIndex: 'PlanTime', key: 'order_finish_time' },
+        { title: '是否加急', dataIndex: 'isUrgent', key: 'order_in_need' },
+        { title: '订单负责人', dataIndex: 'ChargeUser', key: 'order_response_man' },
+        { title: '操作', key: 'order_action', render: editRender },
     ]
 
-    const expandedRowRender = () => {
+    const expandedRowRender = (record) => {
         const columns = [
-            { title: '产品序列号', dataIndex: 'device_id', key: 'device_id' },
-            { title: '产品料号', dataIndex: 'device_type', key: 'device_type' },
-            { title: '产品名称', dataIndex: 'device_name', key: 'device_name' },
-            { title: '开始时间', dataIndex: 'device_start_time', key: 'device_start_time' },
-            { title: '计划完成时间', dataIndex: 'device_end_time', key: 'device_end_time' },
+            { title: '产品序列号', dataIndex: 'SerialNo', key: 'device_id' },
+            { title: 'TerminalID', dataIndex: 'TerminalId', key: 'device_terminalId' },
+            { title: '产品料号', dataIndex: 'ProductID', key: 'device_type' },
+            { title: '产品名称', dataIndex: 'Name', key: 'device_name' },
+            { title: '开始时间', dataIndex: 'CreateTime', key: 'device_start_time' },
+            { title: '计划完成时间', dataIndex: 'PlanTime', key: 'device_end_time' },
         ]
 
-        const data = [
-            { key: 0, device_id: '123456', device_type: '02020103', device_name: '接地箱1', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' },
-            { key: 1, device_id: '123456', device_type: '02020103', device_name: '接地箱2', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' }
-        ]
+        let data = record.Devices.map(item => ({
+            ...item,
+            key: item.SerialNo
+        }))
+
         return <Table className="sub-table" bordered={true} columns={columns} dataSource={data} pagination={false} />;
     }
 
-
-    const data = [
-        { key: 0, order_id: '123456789', order_amount: 2, order_start_time: '2020年1月1日', order_finish_time: '2020年12月12日', order_in_need: '是', order_response_man: '张三' },
-        { key: 1, order_id: '123456789', order_amount: 2, order_start_time: '2020年1月1日', order_finish_time: '2020年12月12日', order_in_need: '否', order_response_man: '李四' },
-        { key: 2, order_id: '123456789', order_amount: 2, order_start_time: '2020年1月1日', order_finish_time: '2020年12月12日', order_in_need: '否', order_response_man: '王五' },
-        { key: 3, order_id: '123456789', order_amount: 2, order_start_time: '2020年1月1日', order_finish_time: '2020年12月12日', order_in_need: '否', order_response_man: '赵六' },
-    ]
+    useEffect(() => {
+        getProductOrdersList({
+            startTime: '',
+            endTime: '',
+            orderId: '',
+            chargeUserId: ''
+        }).then((res: any) => {
+            if (res.code === 200) {
+                let n = res.data.map(item => ({
+                    ...item,
+                    order_amount: item.Devices.length,
+                    key: item.Id,
+                    isUrgent: item.isUrgent ? '是' : '否'
+                }))
+                dispatch({
+                    type: ACTION_TYPE.SET_ORDER_LIST,
+                    payload: n
+                })
+            }
+        })
+    }, [])
 
     return (
         <>
@@ -103,8 +152,8 @@ const ProductionOrders: FC = (props: any): ReactElement => {
                         </Form.Item>
                         <Form.Item label="订单责任人" name="order_response">
                             <Select style={{ width: '120px' }}>
-                                <Select.Option value="zhangsan">张三</Select.Option>
-                                <Select.Option value="lisi">李四</Select.Option>
+                                <Select.Option value="1">张三</Select.Option>
+                                <Select.Option value="2">李四</Select.Option>
                             </Select>
                         </Form.Item>
                         <Form.Item>
@@ -118,7 +167,7 @@ const ProductionOrders: FC = (props: any): ReactElement => {
                         bordered={true}
                         columns={columns}
                         expandable={{ expandedRowRender }}
-                        dataSource={data}
+                        dataSource={state}
                         rowClassName={(record, index) => {
                             let className = 'light-row';
                             if (index % 2 === 1) className = 'dark-row';

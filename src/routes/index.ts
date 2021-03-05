@@ -7,6 +7,7 @@ import {
     production_orders_add,
     production_orders_add_work,
     part_configuration,
+    part_configuration_add,
     form_configuration,
     not_found
 } from '../views'
@@ -71,6 +72,11 @@ const adminRoutes = [
                 exact: true
             },
         ]
+    },
+    {
+        pathName: '/:userID/dc/add',
+        component: part_configuration_add,
+        exact: true
     },
     {
         pathName: '/:userID/sm',

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { ReactNode, useRef, useState, useCallback } from 'react'
 import {
     Card,
     Button,
@@ -13,7 +13,8 @@ import {
     List,
     Breadcrumb,
     message,
-    DatePicker
+    DatePicker,
+    Divider
 } from 'antd'
 import {
     PrinterTwoTone,
@@ -47,53 +48,6 @@ export default function ProductionOrdersAddWork(props) {
         JsBarcode(refBarContainer.current, '020201112220A001', { ..._barcode_options, text: '02020111 2220A001' })
         setIsBarcodeExist(true)
     }
-
-    const columns = [
-        {
-            title: '零件名称',
-            dataIndex: 'part_name',
-            key: 'part_name',
-        },
-        {
-            title: '零件ID',
-            dataIndex: 'part_id',
-            key: 'part_id',
-        },
-        {
-            title: '领料数量',
-            dataIndex: 'part_amount',
-            key: 'part_amount',
-        },
-        {
-            title: '领料时间',
-            dataIndex: 'time',
-            key: 'time',
-        },
-        {
-            title: '领料人',
-            dataIndex: 'man_name',
-            key: 'man_name',
-        },
-        {
-            title: '操作',
-            render: () => (
-                <Button type="primary" danger shape="round">删除</Button>
-            )
-        }
-    ];
-
-    const dataSource = [
-        { key: 1, part_name: '零件a', part_id: '123', part_amount: 5, time: '2020年12月1日', man_name: '张三' },
-        { key: 2, part_name: '零件b', part_id: '321', part_amount: 5, time: '2020年12月1日', man_name: '李四' },
-        { key: 3, part_name: '零件c', part_id: '000', part_amount: 6, time: '2020年12月1日', man_name: '王五' }
-    ]
-
-    const listData = [
-        '零件a',
-        '零件b',
-        '零件c',
-        '零件d'
-    ]
 
     const handlePrint = () => {
         // 判断是否生成条码
@@ -133,6 +87,19 @@ export default function ProductionOrdersAddWork(props) {
         }
     }
 
+    const customizeSelectNode = useCallback((originNode) => {
+        console.log(originNode);
+        return (
+            <div>
+                {originNode}
+                <Divider style={{ margin: '4px 0' }} />
+                <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent:'center', padding: 2 }}>
+                    <Button type="primary" icon={<PlusOutlined />}>导入 BOM</Button>
+                </div>
+            </div>
+        )
+    }, [])
+
     return (
         <>
             <Space direction="vertical" size={8} style={{ width: '100%' }}>
@@ -164,7 +131,7 @@ export default function ProductionOrdersAddWork(props) {
                     <Row gutter={16}>
                         <Col span={18}>
                             <Space direction="vertical" size={16} style={{ width: '100%' }}>
-                                <Card title="基本信息" headStyle={{ fontWeight: 'bold' }} extra={ <Button type="primary" shape="round" onClick={create_barcode}>生成条形码</Button> }>
+                                <Card title="基本信息" headStyle={{ fontWeight: 'bold' }} extra={<Button type="primary" shape="round" onClick={create_barcode}>生成条形码</Button>}>
                                     <Form
                                         layout="inline"
                                     >
@@ -193,7 +160,8 @@ export default function ProductionOrdersAddWork(props) {
                                     <Space direction="vertical" size={16} style={{ width: '100%' }}>
                                         <Form
                                             form={form}
-                                            layout="inline"
+                                            // layout="inline"
+                                            initialValues={{ have_position: ['1', '2', '3', '4', '5', '6'] }}
                                         >
                                             <Form.Item
                                                 label="包含岗位"
@@ -203,7 +171,6 @@ export default function ProductionOrdersAddWork(props) {
                                                     mode="multiple"
                                                     allowClear
                                                     style={{ width: '500px' }}
-                                                    defaultValue={['1', '2', '3', '4', '5', '6']}
                                                     placeholder="请选择此设备包含岗位"
                                                 >
                                                     <Select.Option value="1">装配</Select.Option>
@@ -214,15 +181,13 @@ export default function ProductionOrdersAddWork(props) {
                                                     <Select.Option value="6">运维</Select.Option>
                                                 </Select>
                                             </Form.Item>
+                                            <Form.Item label="零部件 BOM 方案" name="device_bom">
+                                                <Select style={{ width: '130px' }} dropdownRender={customizeSelectNode}>
+                                                    <Select.Option value="1">BOM 方案一</Select.Option>
+                                                    <Select.Option value="2">BOM 方案二</Select.Option>
+                                                </Select>
+                                            </Form.Item>
                                         </Form>
-                                        <Card
-                                            title="设备零部件清单"
-                                            bodyStyle={{ padding: 0 }}
-                                            bordered={false}
-                                            headStyle={{ padding: 0, fontWeight: 'bold' }}
-                                        >
-                                            <Table columns={columns} dataSource={dataSource} bordered />
-                                        </Card>
                                     </Space>
                                 </Card>
                             </Space>
@@ -239,18 +204,9 @@ export default function ProductionOrdersAddWork(props) {
                                     </div>
                                 </Card>
                                 <Card
-                                    title="零部件列表"
-                                    bodyStyle={{ padding: 0 }}
+                                    title="零部件 BOM 方案预览"
                                 >
-                                    <List
-                                        size="small"
-                                        dataSource={listData}
-                                        renderItem={item => (
-                                            <List.Item actions={[<Button type="ghost" shape="circle" icon={<PlusOutlined />}></Button>]}>
-                                                {item}
-                                            </List.Item>
-                                        )}
-                                    />
+
                                 </Card>
                             </Space>
                         </Col>

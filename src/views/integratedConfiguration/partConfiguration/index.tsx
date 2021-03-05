@@ -6,13 +6,16 @@ import {
     Button,
     Space,
     Select,
-    Table
+    Table,
+    Input,
+    Divider,
+    Breadcrumb
 } from 'antd'
 import {
     FolderOpenOutlined
 } from '@ant-design/icons'
 
-export default function DeviceConfiguration() {
+export default function DeviceConfiguration(props) {
     const [form] = Form.useForm()
     const columns = [
         { title: '方案名称', dataIndex: 'plan_name', key: 'plan_name' },
@@ -54,34 +57,55 @@ export default function DeviceConfiguration() {
         return <Table bordered={true} columns={columns} dataSource={data} pagination={false} />;
     }
 
+    const handleAdd = () => {
+        props.history.push('/' + 'my-userid' + '/dc/add')
+    }
+
     return (
         <>
-            <Card
-                title="零件配置"
-                extra={
-                    <Space size={16}>
-                        <Button shape="round" type="default" icon={<FolderOpenOutlined />}>导入方案</Button>
-                        <Button shape="round" type="primary">保存修改</Button>
-                    </Space>
-                }
-            >
-                <Form form={form}>
-                    <Form.Item label="设备类型" name="device_type" className="form-item">
-                        <Select style={{ width: '200px' }}>
-                            <Select.Option value="1">1</Select.Option>
-                            <Select.Option value="2">2</Select.Option>
-                        </Select>
-                    </Form.Item>
-                </Form>
+            <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                <div className="bread-area">
+                    <div style={{ paddingRight: '5px' }}>当前路径：</div>
+                    <Breadcrumb separator=">">
+                        <Breadcrumb.Item>
+                            <span className="bread-item">零件 BOM 列表</span>
+                        </Breadcrumb.Item>
+                    </Breadcrumb>
+                </div>
                 <Card
-                    title="预设方案"
-                    headStyle={{ fontWeight: 'bold', padding: 0 }}
-                    bodyStyle={{ padding: 0 }}
-                    bordered={false}
+                    title="零件 BOM 列表"
+                    extra={
+                        <Space size={16}>
+                            {/* <Button shape="round" type="default" icon={<FolderOpenOutlined />}>导入方案</Button> */}
+                            <Button shape="round" type="primary" onClick={handleAdd}>添加 BOM</Button>
+                        </Space>
+                    }
                 >
-                    <Table bordered columns={columns} dataSource={dataSource} expandable={{ expandedRowRender }} />
+                    <Form form={form} layout="inline">
+                        <Form.Item label="设备类型" name="device_type" className="form-item">
+                            <Select style={{ width: '400px' }}>
+                                <Select.Option value="02020103">智能防盗型保护接地箱（直立式）无监测(02020103)</Select.Option>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item label="方案名称" name="bom_name" className="form-item">
+                            <Input />
+                        </Form.Item>
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit">
+                                查询
+                        </Button>
+                        </Form.Item>
+                    </Form>
+                    <Divider />
+                    <Card
+                        headStyle={{ fontWeight: 'bold', padding: 0 }}
+                        bodyStyle={{ padding: 0 }}
+                        bordered={false}
+                    >
+                        <Table bordered columns={columns} dataSource={dataSource} expandable={{ expandedRowRender }} />
+                    </Card>
                 </Card>
-            </Card>
+            </Space>
         </>
     )
 }

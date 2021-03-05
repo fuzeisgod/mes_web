@@ -14,8 +14,9 @@ import {
 } from 'antd'
 import { EditOutlined, UserOutlined } from '@ant-design/icons';
 import './staff_management.less';
-import { ACTION_TYPE, ITree } from './typings';
+import { ACTION_TYPE, ITree, ITreeDataNode, ITreeNode } from './typings';
 import { treeReducer } from './reducer';
+import { getUsersList } from '../../api/staff'
 
 const initialState: ITree = {
     treeData: []
@@ -43,52 +44,39 @@ const StaffManagement: FC = (): ReactElement => {
         setIsEditMode(!isEditMode)
     }
 
-    useEffect(() => {
-        // TODO... get treeData here （result）
-        let result = [
-            {
-                title: '部门A',
-                key: '0-0',
-                children: [
-                    {
-                        title: '工人1',
-                        key: '0-0-0',
-                        id: 1,
-                        icon: <UserOutlined />
-                    },
-                    {
-                        title: '工人2',
-                        key: '0-0-1',
-                        id: 2,
-                        icon: <UserOutlined />
-                    }
-                ],
-            },
-            {
-                title: '部门B',
-                key: '0-1',
-                children: [
-                    {
-                        title: '工人3',
-                        key: '0-1-0',
-                        id: 4,
-                        icon: <UserOutlined />
-                    },
-                    {
-                        title: '工人4',
-                        key: '0-1-1',
-                        id: 5,
-                        icon: <UserOutlined />
-                    }
-                ],
-            }
-        ]
-
-        dispatch({
-            type: ACTION_TYPE.GET_TREE,
-            payload: result
+    // 处理树结构返回数据
+    const handleTreeData = (treeData: ITreeDataNode[]): ITreeNode[] => {
+        let result = []
+        treeData.forEach((item1) => {
+            let children = []
+            item1.Users.forEach((item2) => {
+                children.push({
+                    title: item2.Name,
+                    key: 'u_' + item2.Id,
+                    id: item2.Id,
+                    icon: <UserOutlined />
+                })
+            })
+            result.push({
+                title: item1.Department,
+                key: 'd_' + item1.DepartId,
+                children: children
+            })
         })
+        return result
+    }
 
+    useEffect(() => {
+        let result = []
+        getUsersList().then((res: any) => {
+            if (res.code === 200) {
+                let result = handleTreeData(res.data)
+                dispatch({
+                    type: ACTION_TYPE.GET_TREE,
+                    payload: result
+                })
+            }
+        })
     }, [])
 
     return (

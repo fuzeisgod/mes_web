@@ -20,3 +20,17 @@ export interface IAction {
 export enum ACTION_TYPE {
     GET_TREE = "getTree",
 }
+
+export interface ITreeUsersNode {
+    Account: string;
+    Id: string | number;
+    Name: string;
+    Position: string;
+}
+
+export interface ITreeDataNode {
+    DepartId: string | number;
+    Department: string;
+    Users: ITreeUsersNode[];
+}
+
