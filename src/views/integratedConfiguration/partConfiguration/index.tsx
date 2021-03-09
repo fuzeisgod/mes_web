@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import './part_configuration.less'
 import {
     Form,
@@ -14,11 +14,19 @@ import {
 import {
     FolderOpenOutlined
 } from '@ant-design/icons'
+import { getBomList } from '../../../api/integratedconfig'
+import { dataSourceReducer } from './reducer'
+import { ACTION_TYPE } from './typings'
 
 export default function DeviceConfiguration(props) {
     const [form] = Form.useForm()
+    const [sProjectName, setSProjectName] = useState<string>("")
+    const [sCpspcode, setSCpspcode] = useState<string>("")
+    const [state, dispatch] = useReducer(dataSourceReducer, [])
+
     const columns = [
-        { title: '方案名称', dataIndex: 'plan_name', key: 'plan_name' },
+        { title: '方案名称', dataIndex: 'customizename', key: 'customizename' },
+        { title: '母件编码', dataIndex: 'cpspcodeH', key: 'cpspcodeH' },
         {
             title: '操作', render: () => (
                 <Space size={16}>
@@ -28,38 +36,63 @@ export default function DeviceConfiguration(props) {
             )
         },
     ]
-    const dataSource = [
-        {
-            key: 1,
-            plan_name: '方案1'
-        },
-        {
-            key: 2,
-            plan_name: '方案2'
-        },
-        {
-            key: 3,
-            plan_name: '方案3'
-        }
-    ]
 
-    const expandedRowRender = () => {
+    const expandedRowRender = (e) => {
+        console.log(e)
         const columns = [
-            { title: '零件名称', dataIndex: 'part_name', key: 'part_name' },
-            { title: '零件ID', dataIndex: 'part_id', key: 'part_id' },
-            { title: '零件数量', dataIndex: 'part_count', key: 'part_count' },
+            // { title: '母件编码 *(cpspcode)H', dataIndex: 'cpspcodeH', key: 'cpspcodeH', width: 100 },
+            // { title: '母件名称 *(cinvname)H', dataIndex: 'cinvnameH', key: 'cinvnameH', width: 100 },
+            // { title: '规格型号(cinvstd)H', dataIndex: 'cinvstdH', key: 'cinvstdH', width: 100 },
+            // { title: '是否展开(bexpand)H', dataIndex: 'bexpandH', key: 'bexpandH', width: 100 },
+            // { title: '部门名称(cdepname)H', dataIndex: 'cdepnameH', key: 'cdepnameH', width: 100 },
+            // { title: '部门编码(cdepcode)H', dataIndex: 'cdepcodeH', key: 'cdepcodeH', width: 100 },
+            // { title: '默认成本BOM(bmrcbbom)H', dataIndex: 'bmrcbbomH', key: 'bmrcbbomH', width: 100 },
+            // { title: '版本号(csocode)H', dataIndex: 'csocodeH', key: 'csocodeH', width: 100 },
+            // { title: '备注(cmemo)H', dataIndex: 'cmemoH', key: 'cmemoH', width: 100 },
+            { title: '子件编码(cpscode)', dataIndex: 'cpscode', key: 'cpscode', width: 100 },
+            { title: '子件名称(cinvname)', dataIndex: 'cinvname', key: 'cinvname', width: 100 },
+            { title: '规格型号(cinvstd)', dataIndex: 'cinvstd', key: 'cinvstd', width: 150 },
+            // { title: '版本号(csocode)', dataIndex: 'csocode', key: 'csocode', width: 100 },
+            { title: '主计量(ccomunitname)', dataIndex: 'ccomunitname', key: 'ccomunitname', width: 100 },
+            { title: '基本用量分子(ipsquantity)', dataIndex: 'ipsquantity', key: 'ipsquantity', width: 200 },
+            { title: '基本用量分母(tdqtyd)', dataIndex: 'tdqtyd', key: 'tdqtyd', width: 200 },
+            // { title: '标准单价(fbzdj)', dataIndex: 'fbzdj', key: 'fbzdj', width: 150 },
+            // { title: '标准物料成本(fbzwlcb)', dataIndex: 'fbzwlcb', key: 'fbzwlcb', width: 200 },
+            // { title: '损耗率%(iwasterate)', dataIndex: 'iwasterate', key: 'iwasterate', width: 100 },
+            // { title: '存放仓库(cwhname)', dataIndex: 'cwhname', key: 'cwhname', width: 100 },
+            // { title: '库管员(cpersonname)', dataIndex: 'cpersonname', key: 'cpersonname', width: 100 },
+            // { title: '用料车间(usedept)', dataIndex: 'usedept', key: 'usedept', width: 100 },
+            // { title: '物料类型(wiptype)', dataIndex: 'wiptype', key: 'wiptype', width: 100 },
+            // { title: '替代标示(replaceflag)', dataIndex: 'replaceflag', key: 'replaceflag', width: 100 },
+            // { title: '图片(ginvpicture)', dataIndex: 'ginvpicture', key: 'ginvpicture', width: 100 },
         ]
 
-        const data = [
-            { key: 0, part_name: '零件a', part_id: '123456', part_count: '3' },
-            { key: 1, part_name: '零件b', part_id: '234567', part_count: '5' }
-        ]
-        return <Table bordered={true} columns={columns} dataSource={data} pagination={false} />;
+        return <Table bordered={true} columns={columns} dataSource={[e]} pagination={false} />;
     }
 
     const handleAdd = () => {
         props.history.push('/' + 'my-userid' + '/dc/add')
     }
+
+    const handleSearch = (values) => {
+        let { bom_name, device_type } = values;
+        if (bom_name) setSProjectName(bom_name)
+        if (device_type) setSCpspcode(device_type)
+    }
+
+    useEffect(() => {
+        console.log('effct')
+        getBomList({ projectName: sProjectName, cpspcode: sCpspcode }).then((res: any) => {
+            console.log(res)
+            if (res.code === 200) {
+                let payload = res.data.map((item, index) => ({
+                    ...item,
+                    key: index
+                }))
+                dispatch({ type: ACTION_TYPE.SET_DATA_SOURCE, payload })
+            }
+        })
+    }, [sProjectName, sCpspcode])
 
     return (
         <>
@@ -81,7 +114,7 @@ export default function DeviceConfiguration(props) {
                         </Space>
                     }
                 >
-                    <Form form={form} layout="inline">
+                    <Form form={form} layout="inline" onFinish={handleSearch}>
                         <Form.Item label="设备类型" name="device_type" className="form-item">
                             <Select style={{ width: '400px' }}>
                                 <Select.Option value="02020103">智能防盗型保护接地箱（直立式）无监测(02020103)</Select.Option>
@@ -102,7 +135,7 @@ export default function DeviceConfiguration(props) {
                         bodyStyle={{ padding: 0 }}
                         bordered={false}
                     >
-                        <Table bordered columns={columns} dataSource={dataSource} expandable={{ expandedRowRender }} />
+                        <Table bordered columns={columns} dataSource={state} expandable={{ expandedRowRender }} />
                     </Card>
                 </Card>
             </Space>

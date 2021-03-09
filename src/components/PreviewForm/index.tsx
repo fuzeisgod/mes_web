@@ -8,7 +8,7 @@ import {
 import './preview_form.less'
 
 export default function PreviewForm(props:any) {
-    console.log(props)
+    // console.log(props)
     return (
         <>
             <div className="form_title">{props.basicOptions.form_name || '表单名称'}</div>

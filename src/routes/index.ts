@@ -9,6 +9,7 @@ import {
     part_configuration,
     part_configuration_add,
     form_configuration,
+    form_configuration_add,
     not_found
 } from '../views'
 
@@ -76,6 +77,11 @@ const adminRoutes = [
     {
         pathName: '/:userID/dc/add',
         component: part_configuration_add,
+        exact: true
+    },
+    {
+        pathName: '/:userID/fc/add',
+        component: form_configuration_add,
         exact: true
     },
     {

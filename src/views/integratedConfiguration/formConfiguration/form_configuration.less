@@ -1,13 +1,16 @@
-.row-dragging {
-    background: #fafafa;
-    border: 1px solid #ccc;
+.form-item {
+    padding: 8px 0;
 }
 
-.row-dragging td {
-    padding: 16px;
-    visibility: hidden;
-}
+.bread-area {
+    display: flex;
+    padding-left: 15px;
 
-.row-dragging .drag-visible {
-    visibility: visible;
+    .bread-item {
+        cursor: pointer;
+
+        &:hover {
+            color: @primary-color;
+        }
+    }
 }

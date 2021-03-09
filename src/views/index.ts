@@ -13,6 +13,7 @@ const part_configuration = React.lazy(() => import('./integratedConfiguration/pa
 const part_configuration_add = React.lazy(() => import('./integratedConfiguration/partConfiguration/partConfigurationAdd'))
 
 const form_configuration = React.lazy(() => import('./integratedConfiguration/formConfiguration'))
+const form_configuration_add = React.lazy(() => import('./integratedConfiguration/formConfiguration/formConfigurationAdd'))
 
 export {
     login,
@@ -25,5 +26,6 @@ export {
     part_configuration,
     part_configuration_add,
     form_configuration,
+    form_configuration_add,
     not_found
 }
