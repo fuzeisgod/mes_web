@@ -38,7 +38,7 @@ export default function FormConfigurationAdd(props) {
 
     const columns = [
         { dataIndex: 'sort', width: 50, className: 'drag-visible', render: () => <DragHandle /> },
-        { title: '表单子项名称', dataIndex: 'item_name', className: 'drag-visible', },
+        { title: '工单子项名称', dataIndex: 'item_name', className: 'drag-visible', },
         {
             title: '操作', width: 150, render: (text, record) => (
                 <Space size={16}>
@@ -104,10 +104,10 @@ export default function FormConfigurationAdd(props) {
             type: ACTION_TYPE.DELETE_FORM_PROP,
             payload: e
         })
-        message.info('表单项已删除！')
+        message.info('工单项已删除！')
     }
 
-    // 表单基本配置提交
+    // 工单基本配置提交
     const handleSaveOptions = () => {
         let { form_name, form_abbreviation, belong_work, belong_step } = form1.getFieldsValue()
         dispatch({
@@ -121,7 +121,7 @@ export default function FormConfigurationAdd(props) {
         })
     }
 
-    // 添加表单子项提交
+    // 添加工单子项提交
     const handleAddItem = () => {
         const {
             item_name,
@@ -170,15 +170,15 @@ export default function FormConfigurationAdd(props) {
                     <div style={{ paddingRight: '5px' }}>当前路径：</div>
                     <Breadcrumb separator=">">
                         <Breadcrumb.Item>
-                            <span className="bread-item" onClick={() => { props.history.go(-1) }}>表单模板列表</span>
+                            <span className="bread-item" onClick={() => { props.history.go(-1) }}>工单模板列表</span>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
-                            <span className="bread-item">表单配置</span>
+                            <span className="bread-item">工单配置</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                 </div>
                 <Card
-                    title="表单配置"
+                    title="工单配置"
                     bodyStyle={{ padding: '2px 16px 14px 16px', background: '#fafafa' }}
                     extra={<Button type="primary" shape="round" onClick={handleSaveFormModel}>提交保存</Button>}
                 >
@@ -186,7 +186,7 @@ export default function FormConfigurationAdd(props) {
                         <Col span={12}>
                             <Space direction="vertical" size={16} style={{ width: '100%' }}>
                                 <Card
-                                    title="表单基本配置"
+                                    title="工单基本配置"
                                     bodyStyle={{ padding: '12px 20px' }}
                                     extra={<Button type='primary' shape="round" onClick={handleSaveOptions}>提交保存</Button>}
                                 >
@@ -194,8 +194,8 @@ export default function FormConfigurationAdd(props) {
                                         layout="inline"
                                         form={form1}
                                     >
-                                        <Form.Item label="表单名称" name="form_name">
-                                            <Input placeholder="请输入表单名称" />
+                                        <Form.Item label="工单名称" name="form_name">
+                                            <Input placeholder="请输入工单名称" />
                                         </Form.Item>
                                         <Form.Item label="所属岗位" name="belong_work">
                                             <Select style={{ width: '200px' }}>
@@ -203,19 +203,16 @@ export default function FormConfigurationAdd(props) {
                                                 <Select.Option value="2">2</Select.Option>
                                             </Select>
                                         </Form.Item>
-                                        <Form.Item label="所属步骤" name="belong_step">
+                                        <Form.Item label="所属设备类型" name="device_type">
                                             <Select style={{ width: '200px' }}>
                                                 <Select.Option value="1">1</Select.Option>
                                                 <Select.Option value="2">2</Select.Option>
                                             </Select>
                                         </Form.Item>
-                                        <Form.Item label="表单简称" name="form_abbreviation">
-                                            <Input placeholder="请输入表单简称" />
-                                        </Form.Item>
                                     </Form>
                                 </Card>
                                 <Card
-                                    title="新增表单子项"
+                                    title="新增工单子项"
                                     bodyStyle={{ padding: '12px 20px' }}
                                     extra={<Button type="primary" shape="round" onClick={handleAddItem}>添加子项</Button>}
                                 >
@@ -227,10 +224,10 @@ export default function FormConfigurationAdd(props) {
                                             ['item_is_readonly']: false
                                         }}
                                     >
-                                        <Form.Item label="表单子项名称" name="item_name">
-                                            <Input placeholder="请输入表单子项名称" />
+                                        <Form.Item label="工单子项名称" name="item_name">
+                                            <Input placeholder="请输入工单子项名称" />
                                         </Form.Item>
-                                        <Form.Item label="表单子项输入形式" name="item_submit_type">
+                                        <Form.Item label="工单子项输入形式" name="item_submit_type">
                                             <Select style={{ width: '200px' }}>
                                                 <Select.Option value="input">文字输入</Select.Option>
                                                 <Select.Option value="select">下拉选择</Select.Option>
@@ -253,7 +250,7 @@ export default function FormConfigurationAdd(props) {
                                     </Form>
                                 </Card>
                                 <Card
-                                    title="表单子项列表"
+                                    title="工单子项列表"
                                     bodyStyle={{ padding: '0' }}
                                 >
                                     <Table
@@ -275,7 +272,7 @@ export default function FormConfigurationAdd(props) {
                         <Col span={12}>
                             <Space direction="vertical" size={16} style={{ width: '100%' }}>
                                 <Card
-                                    title="表单预览"
+                                    title="工单预览"
                                     bodyStyle={{ padding: '0 25px 25px 25px' }}
                                 >
                                     <PreviewForm basicOptions={state.toJS().basicOptions} formItemProps={state.toJS().formProps} />

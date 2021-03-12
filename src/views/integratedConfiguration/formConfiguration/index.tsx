@@ -10,17 +10,25 @@ import {
     Table
 } from 'antd'
 import './form_configuration.less'
+import { getMouldList } from '../../../api/integratedconfig'
+import { useEffect, useReducer } from 'react'
+import { mouldListReducer } from './reducer'
+import { ACTION_TYPE } from './typings'
 
 export default function FormConfiguration(props) {
     const [form] = Form.useForm()
+
+    const [state, dispatch] = useReducer(mouldListReducer, [])
 
     const handleAdd = () => {
         props.history.push('/' + 'my-userid' + '/fc/add')
     }
 
     const columns = [
-        { title: '模板名称', dataIndex: 'model_name', key: 'model_name' },
-        { title: '模板ID', dataIndex: 'model_id', key: 'model_id' },
+        { title: '模板名称', dataIndex: 'mouldName', key: 'mouldName' },
+        { title: '模板ID', dataIndex: 'typeId', key: 'typeId' },
+        { title: '岗位', dataIndex: 'position', key: 'position' },
+        { title: '设备类型', dataIndex: 'deviceType', key: 'deviceType' },
         {
             title: '操作', render: () => (
                 <Space size={16}>
@@ -37,8 +45,24 @@ export default function FormConfiguration(props) {
     }
 
     const expandedRowRender = (e) => {
+        console.log(e)
         return <div>1</div>
     }
+
+    useEffect(() => {
+        getMouldList().then((res: any) => {
+            if (res.code === 200) {
+                let payload = res.data.map((item) => ({
+                    ...item,
+                    key: item.typeId
+                }))
+                dispatch({
+                    type: ACTION_TYPE.SET_DATA_SOURCE,
+                    payload: payload
+                })
+            }
+        })
+    }, [])
 
     return (
         <>
@@ -47,12 +71,12 @@ export default function FormConfiguration(props) {
                     <div style={{ paddingRight: '5px' }}>当前路径：</div>
                     <Breadcrumb separator=">">
                         <Breadcrumb.Item>
-                            <span className="bread-item">表单模板列表</span>
+                            <span className="bread-item">工单模板列表</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                 </div>
                 <Card
-                    title="表单模板列表"
+                    title="工单模板列表"
                     extra={
                         <Space size={16}>
                             {/* <Button shape="round" type="default" icon={<FolderOpenOutlined />}>导入方案</Button> */}
@@ -81,7 +105,7 @@ export default function FormConfiguration(props) {
                         bodyStyle={{ padding: 0 }}
                         bordered={false}
                     >
-                        <Table bordered columns={columns} dataSource={[]} expandable={{ expandedRowRender }} />
+                        <Table bordered columns={columns} dataSource={state} expandable={{ expandedRowRender }} />
                     </Card>
                 </Card>
             </Space>

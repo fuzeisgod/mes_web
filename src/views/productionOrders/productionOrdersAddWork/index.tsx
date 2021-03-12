@@ -93,7 +93,7 @@ export default function ProductionOrdersAddWork(props) {
             <div>
                 {originNode}
                 <Divider style={{ margin: '4px 0' }} />
-                <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent:'center', padding: 2 }}>
+                <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', padding: 2 }}>
                     <Button type="primary" icon={<PlusOutlined />}>导入 BOM</Button>
                 </div>
             </div>
@@ -151,44 +151,19 @@ export default function ProductionOrdersAddWork(props) {
                                         <Form.Item label="计划完成时间" name="device_finish_time">
                                             <DatePicker />
                                         </Form.Item>
+                                        <Form.Item label="综合方案选择" name="device_finish_time">
+                                            <Select style={{ width: '250px' }}>
+                                                <Select.Option value="1">1</Select.Option>
+                                                <Select.Option value="2">2</Select.Option>
+                                            </Select>
+                                        </Form.Item>
                                     </Form>
                                 </Card>
                                 <Card
                                     title="设备属性"
                                     headStyle={{ fontWeight: 'bold' }}
                                 >
-                                    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-                                        <Form
-                                            form={form}
-                                            // layout="inline"
-                                            initialValues={{ have_position: ['1', '2', '3', '4', '5', '6'] }}
-                                        >
-                                            <Form.Item
-                                                label="包含岗位"
-                                                name="have_position"
-                                            >
-                                                <Select
-                                                    mode="multiple"
-                                                    allowClear
-                                                    style={{ width: '500px' }}
-                                                    placeholder="请选择此设备包含岗位"
-                                                >
-                                                    <Select.Option value="1">装配</Select.Option>
-                                                    <Select.Option value="2">调试</Select.Option>
-                                                    <Select.Option value="3">质检</Select.Option>
-                                                    <Select.Option value="4">仓库</Select.Option>
-                                                    <Select.Option value="5">安装</Select.Option>
-                                                    <Select.Option value="6">运维</Select.Option>
-                                                </Select>
-                                            </Form.Item>
-                                            <Form.Item label="零部件 BOM 方案" name="device_bom">
-                                                <Select style={{ width: '130px' }} dropdownRender={customizeSelectNode}>
-                                                    <Select.Option value="1">BOM 方案一</Select.Option>
-                                                    <Select.Option value="2">BOM 方案二</Select.Option>
-                                                </Select>
-                                            </Form.Item>
-                                        </Form>
-                                    </Space>
+                                    
                                 </Card>
                             </Space>
                         </Col>

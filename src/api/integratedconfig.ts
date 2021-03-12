@@ -9,3 +9,7 @@ export const addMould = (mould) => {
         Mould: mould
     })
 }
+
+export const getMouldList = () => {
+    return service.post(`/api/Mould/GetMouldList`)
+}
