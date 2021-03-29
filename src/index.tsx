@@ -5,6 +5,10 @@ import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/lib/locale/zh_CN';
 import { mainRoutes } from './routes'
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+
+moment.locale('zh-cn');
 
 ReactDOM.render(
   <ConfigProvider locale={zhCN}>

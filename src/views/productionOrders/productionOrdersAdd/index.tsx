@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import {
     Card,
     Button,
@@ -12,41 +12,63 @@ import {
     Divider,
     Table,
     Breadcrumb,
-    message
+    message,
+    Popconfirm
 } from 'antd'
 import {
-    PlusOutlined
+    PlusOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons'
 import './production_order_add.less'
-import { addProductOrder, getDeviceListByOrderId } from '../../../api/product'
+import { addProductOrder, getDeviceListByOrderId, getProductOrderInfoByOrderId, upDateOrderInfo } from '../../../api/product'
+import { getUsersList } from '../../../api/staff'
 import { getSearchObj } from '../../../tools/index'
 import { productDeviceListReducer } from './reducer'
-import { ACTION_TYPE } from './typings'
+import { ACTION_TYPE, MODE_TYPE } from './typings'
+import moment from 'moment'
 
 export default function ProductionOrdersAdd(props: any) {
     const [form] = Form.useForm()
-    const [state, dispatch] = useReducer(productDeviceListReducer, [])
+    const [_state, dispatch] = useReducer(productDeviceListReducer, {
+        tableData: [],
+        userList: [],
+        mode: 0,
+        orderId: 0
+    })
 
     const columns = [
-        { title: '产品序列号', dataIndex: 'SerialNo', key: 'device_id' },
-        { title: 'TerminalID', dataIndex: 'TerminalId', key: 'device_terminalId' },
-        { title: '产品料号', dataIndex: 'ProductID', key: 'device_type' },
-        { title: '产品名称', dataIndex: 'Name', key: 'device_name' },
-        { title: '开始时间', dataIndex: 'CreateTime', key: 'device_start_time' },
-        { title: '计划完成时间', dataIndex: 'PlanTime', key: 'device_end_time' },
-        { title: '操作', key: 'order_action', render: () => (<a>编辑</a>) },
+        { title: '产品序列号', dataIndex: 'SerialNo', key: 'SerialNo' },
+        { title: 'TerminalID', dataIndex: 'TerminalId', key: 'TerminalId' },
+        { title: '产品料号', dataIndex: 'MaterialCode', key: 'MaterialCode' },
+        { title: '产品名称', dataIndex: 'Name', key: 'Name' },
+        { title: '开始时间', dataIndex: 'CreateTime', key: 'CreateTime' },
+        { title: '计划完成时间', dataIndex: 'PlanTime', key: 'PlanTime' },
+        {
+            title: '操作', key: 'orderAction', render: () => (
+                <Space size={16}>
+                    <Button onClick={handleClickEdit} type="primary" size="small" shape="round">编辑</Button>
+                    <Popconfirm title="确认删除？" icon={<ExclamationCircleOutlined style={{ color: 'red' }} />} onConfirm={handleDelete}>
+                        <Button danger type="primary" size="small" shape="round">删除</Button>
+                    </Popconfirm>
+                </Space>
+            )
+        },
     ]
 
-    const data = [
-        { key: 0, device_id: '123456', device_type: '02020103', device_name: '接地箱1', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' },
-        { key: 1, device_id: '123456', device_type: '02020103', device_name: '接地箱2', device_start_time: '2020年10月15日', device_end_time: '2020年11月1日' }
-    ]
+    const handleClickEdit = () => {
+
+    }
+
+    const handleDelete = () => {
+
+    }
 
     const add_new_work = () => {
         // you need add userid here
-        props.history.push('/' + 'my-userid' + '/po/edit_order/edit_work')
+        props.history.push('/' + 'my-userid' + '/po/edit_order/edit_work?orderId=' + _state.orderId)
     }
 
+    // add or edit orderInfo
     const handleAdd = () => {
         let {
             order_finish_time,
@@ -58,31 +80,99 @@ export default function ProductionOrdersAdd(props: any) {
         if (!order_finish_time || !order_id || !order_response_man || !order_start_time) {
             return message.warning('信息未填写完整！')
         }
-        addProductOrder({
-            ProductNo: order_id || '',
-            PlanTime: order_finish_time || '',
-            CreateTime: order_start_time || '',
-            ChargeUserId: order_response_man || '',
-            isUrgent: !order_in_need,
-        }).then((res: any) => {
-            if (res.code === 200) {
-                message.success(res.msg);
-            }
-        })
+        if (_state.mode === MODE_TYPE.CREATE) {
+            addProductOrder({
+                OrderNo: order_id,
+                PlanTime: order_finish_time,
+                CreateTime: order_start_time,
+                ChargeUserId: order_response_man,
+                isUrgent: !order_in_need,
+            }).then((res: any) => {
+                console.log(res)
+                if (res.code === 200) {
+                    dispatch({
+                        type: ACTION_TYPE.SET_ORDERID,
+                        payload: res.data[0].Id
+                    })
+                    message.success(res.msg);
+                }
+            })
+        } else if (_state.mode === MODE_TYPE.EDIT && _state.orderId !== 0) {
+            upDateOrderInfo({
+                Id: _state.orderId,
+                OrderNo: order_id,
+                PlanTime: order_finish_time,
+                CreateTime: order_start_time,
+                ChargeUserId: order_response_man,
+                isUrgent: !order_in_need
+            }).then((res: any) => {
+                if (res.code === 200) {
+                    message.success(res.msg)
+                }
+            })
+        }
     }
 
+    // 1. prepare work
+    // get orderId, set mode type and get user select options
     useEffect(() => {
         if (props.location.search) {
-            let { productId } = getSearchObj(props.location.search)
-            getDeviceListByOrderId(productId).then((res: any) => {
+            let { orderId } = getSearchObj(props.location.search)
+            let _orderId = parseInt(orderId)
+            // set edit mode
+            dispatch({
+                type: ACTION_TYPE.SET_MODE_TYPE,
+                payload: {
+                    type: MODE_TYPE.EDIT,
+                    orderId: _orderId
+                }
+            })
+        }
+        getUsersList().then((res: any) => {
+            if (res.code === 200) {
+                let n = res.data.map(item => ({
+                    Name: item.Name,
+                    Id: item.Id
+                }))
+                dispatch({
+                    type: ACTION_TYPE.SET_USER_LIST,
+                    payload: n
+                })
+            }
+        })
+    }, [])
+
+    // 2. getdata work
+    // if EDIT_MODE, get DeviceList and orderInfo
+    useEffect(() => {
+        if (_state.mode !== (MODE_TYPE.CREATE || MODE_TYPE.EDIT) || _state.orderId === 0) return;
+
+        // get OrderBasicInfo by orderId
+        getProductOrderInfoByOrderId(_state.orderId).then((res: any) => {
+            if (res.code === 200) {
+                form.setFieldsValue({
+                    order_id: res.data[0].OrderNo,
+                    order_start_time: moment(res.data[0].CreateTime),
+                    order_finish_time: moment(res.data[0].PlanTime),
+                    order_in_need: !res.data[0].isUrgent,
+                    order_response_man: res.data[0].ChargeUserId
+                })
+            }
+        })
+
+        // get DeviceList by orderId
+        getDeviceListByOrderId(_state.orderId).then((res: any) => {
+            if (res.code === 200) {
                 let payload = res.data.map(item => ({
                     ...item,
+                    CreateTime: moment(item.CreateTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
+                    PlanTime: moment(item.PlanTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
                     key: item.SerialNo
                 }))
                 dispatch({ type: ACTION_TYPE.SET_DEVICE_LIST, payload })
-            })
-        }
-    }, [])
+            }
+        })
+    }, [_state.orderId, _state.mode])
 
     return (
         <>
@@ -128,9 +218,12 @@ export default function ProductionOrdersAdd(props: any) {
                             <Switch checkedChildren="正常" unCheckedChildren="加急" className="order-form-switch" />
                         </Form.Item>
                         <Form.Item label="订单负责人" name="order_response_man">
-                            <Select style={{ width: '120px' }}>
-                                <Select.Option value="zhangsan">张三</Select.Option>
-                                <Select.Option value="lisi">李四</Select.Option>
+                            <Select style={{ width: '120px' }} allowClear>
+                                {
+                                    _state.userList.length !== 0 && _state.userList.map(item => {
+                                        return <Select.Option value={item.Id} key={item.Id}>{item.Name}</Select.Option>
+                                    })
+                                }
                             </Select>
                         </Form.Item>
                     </Form>
@@ -139,12 +232,12 @@ export default function ProductionOrdersAdd(props: any) {
                         title="生产订单包含产品"
                         headStyle={{ fontWeight: 'bold' }}
                         bodyStyle={{ padding: 0 }}
-                        extra={<Button type="primary" shape="round" icon={<PlusOutlined />} onClick={add_new_work}>添加新产品</Button>}
+                        extra={<Button type="primary" shape="round" icon={<PlusOutlined />} onClick={add_new_work} disabled={!_state.orderId}>添加新产品</Button>}
                     >
                         <Table
                             bordered={true}
                             columns={columns}
-                            dataSource={state}
+                            dataSource={_state.tableData}
                             rowClassName={(record, index) => {
                                 let className = 'light-row';
                                 if (index % 2 === 1) className = 'dark-row';

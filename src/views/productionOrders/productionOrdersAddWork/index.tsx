@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef, useState, useCallback } from 'react'
+import React, { ReactNode, useRef, useState, useCallback, useEffect, useReducer } from 'react'
 import {
     Card,
     Button,
@@ -14,7 +14,8 @@ import {
     Breadcrumb,
     message,
     DatePicker,
-    Divider
+    Divider,
+    InputNumber
 } from 'antd'
 import {
     PrinterTwoTone,
@@ -22,7 +23,10 @@ import {
 } from '@ant-design/icons'
 import './production_order_add_work.less'
 import JsBarcode from 'jsbarcode'
-import { isIFrame } from '../../../tools'
+import { getSearchObj, isIFrame } from '../../../tools'
+import { productionOrderAddWorkReducer } from './reducer'
+import { ACTION_TYPE } from './typings'
+import { getDeviceTypes, getPlanList, addDevice } from '../../../api/product'
 
 const _barcode_options = {
     format: "CODE128",//选择要使用的条形码类型
@@ -39,10 +43,17 @@ const _barcode_options = {
 }
 
 export default function ProductionOrdersAddWork(props) {
-    const [form] = Form.useForm()
+    const [form1] = Form.useForm()
+    const [form2] = Form.useForm()
     const refBarContainer = useRef<HTMLCanvasElement>(null)
     const mainRef = useRef<HTMLDivElement>(null)
     const [isBarcodeExist, setIsBarcodeExist] = useState<boolean>(false)
+    const [_state, dispatch] = useReducer(productionOrderAddWorkReducer, {
+        count: 0,
+        types: [],
+        typeId: null,
+        plans: []
+    })
 
     const create_barcode = (values) => {
         JsBarcode(refBarContainer.current, '020201112220A001', { ..._barcode_options, text: '02020111 2220A001' })
@@ -87,6 +98,27 @@ export default function ProductionOrdersAddWork(props) {
         }
     }
 
+    const handleSave = () => {
+        let { CreateTime, Name, PlanTime, ProgrammeId, TypeId } = form1.getFieldsValue()
+        let { num } = form2.getFieldsValue()
+        let { orderId } = getSearchObj(props.location.search)
+        if (CreateTime && Name && PlanTime && ProgrammeId && TypeId && num) {
+            addDevice({
+                num,
+                OrderID: orderId,
+                Name,
+                PlanTime,
+                CreateTime,
+                TypeId,
+                ProgrammeId
+            }).then((res: any) => {
+                if (res.code === 200) message.success(res.msg)
+            })
+        } else {
+            message.warning('信息未填写完整！')
+        }
+    }
+
     const customizeSelectNode = useCallback((originNode) => {
         console.log(originNode);
         return (
@@ -99,6 +131,33 @@ export default function ProductionOrdersAddWork(props) {
             </div>
         )
     }, [])
+
+    const handleChange = (changedValues, allValues) => {
+    }
+
+    useEffect(() => {
+        getDeviceTypes().then((res: any) => {
+            if (res.code === 200) {
+                dispatch({
+                    type: ACTION_TYPE.SET_TYPES,
+                    payload: res.data
+                })
+            }
+
+        })
+    }, [])
+
+    useEffect(() => {
+        if (_state.typeId) {
+            getPlanList(_state.typeId).then((res: any) => {
+                console.log(res)
+                dispatch({
+                    type: ACTION_TYPE.SET_PLANS,
+                    payload: res.data
+                })
+            })
+        }
+    }, [_state.typeId])
 
     return (
         <>
@@ -123,38 +182,55 @@ export default function ProductionOrdersAddWork(props) {
                     headStyle={{ fontWeight: 'bold' }}
                     extra={
                         <Space size={16}>
-                            <Button type="primary" shape="round">提交保存</Button>
+                            <Button type="primary" shape="round" onClick={handleSave}>提交保存</Button>
                             <Button type="default" shape="round">取消</Button>
                         </Space>
                     }
                 >
                     <Row gutter={16}>
-                        <Col span={18}>
+                        <Col span={16}>
                             <Space direction="vertical" size={16} style={{ width: '100%' }}>
                                 <Card title="基本信息" headStyle={{ fontWeight: 'bold' }} extra={<Button type="primary" shape="round" onClick={create_barcode}>生成条形码</Button>}>
                                     <Form
                                         layout="inline"
+                                        form={form1}
+                                        initialValues={{ product_count: 1 }}
+                                        onValuesChange={(changedValues) => {
+                                            if (changedValues.hasOwnProperty("TypeId")) {
+                                                dispatch({
+                                                    type: ACTION_TYPE.SET_TYPEID,
+                                                    payload: parseInt(changedValues.TypeId)
+                                                })
+                                            }
+                                        }}
                                     >
-                                        <Form.Item label="产品序列号" name="device_id">
-                                            <Input placeholder="请输入产品序列号" />
-                                        </Form.Item>
-                                        <Form.Item label="产品料号" name="friend_id">
-                                            <Input placeholder="请输入产品料号" />
+
+                                        <Form.Item label="设备类型" name="TypeId">
+                                            <Select style={{ width: '200px' }}>
+                                                {
+                                                    _state.types.length > 0 && _state.types.map((type, index) => (
+                                                        <Select.Option value={type.MaterialCode} key={index}>{type.Name + '(' + type.MaterialCode + ')'}</Select.Option>
+                                                    ))
+                                                }
+                                            </Select>
                                         </Form.Item>
 
-                                        <Form.Item label="产品名称" name="device_name">
+                                        <Form.Item label="产品名称" name="Name">
                                             <Input placeholder="请输入产品名称" />
                                         </Form.Item>
-                                        <Form.Item label="开始时间" name="device_start_time">
+                                        <Form.Item label="开始时间" name="CreateTime">
                                             <DatePicker />
                                         </Form.Item>
-                                        <Form.Item label="计划完成时间" name="device_finish_time">
+                                        <Form.Item label="计划完成时间" name="PlanTime">
                                             <DatePicker />
                                         </Form.Item>
-                                        <Form.Item label="综合方案选择" name="device_finish_time">
-                                            <Select style={{ width: '250px' }}>
-                                                <Select.Option value="1">1</Select.Option>
-                                                <Select.Option value="2">2</Select.Option>
+                                        <Form.Item label="综合方案选择" name="ProgrammeId">
+                                            <Select style={{ width: '250px' }} placeholder="请先选择设备类型" disabled={!_state.typeId}>
+                                                {
+                                                    _state.plans.length > 0 && _state.plans.map((plan, index) => (
+                                                        <Select.Option value={plan.TypeId} key="index">{plan.Name}</Select.Option>
+                                                    ))
+                                                }
                                             </Select>
                                         </Form.Item>
                                     </Form>
@@ -163,12 +239,25 @@ export default function ProductionOrdersAddWork(props) {
                                     title="设备属性"
                                     headStyle={{ fontWeight: 'bold' }}
                                 >
-                                    
+
                                 </Card>
                             </Space>
                         </Col>
-                        <Col span={6}>
+                        <Col span={8}>
                             <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                                <Card
+                                    title="产品序列号"
+                                >
+                                    <Form
+                                        form={form2}
+                                        initialValues={{ num: 1 }}
+                                        onValuesChange={handleChange}
+                                    >
+                                        <Form.Item label="产品数量" name="num">
+                                            <InputNumber min={1} />
+                                        </Form.Item>
+                                    </Form>
+                                </Card>
                                 <Card
                                     title="条码生成区"
                                     extra={<Tooltip title="打印条形码" color="#40a9ff"><Button onClick={handlePrint} icon={<PrinterTwoTone />} shape="circle"></Button></Tooltip>}
@@ -178,11 +267,7 @@ export default function ProductionOrdersAddWork(props) {
                                         <canvas ref={refBarContainer} className="barcode-container" />
                                     </div>
                                 </Card>
-                                <Card
-                                    title="零部件 BOM 方案预览"
-                                >
 
-                                </Card>
                             </Space>
                         </Col>
                     </Row>

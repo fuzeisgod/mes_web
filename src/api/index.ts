@@ -5,11 +5,13 @@ import { decryptAES } from '../tools/aes'
 const isDev = process.env.NODE_ENV === 'development'
 
 const service1 = axios.create({
-    baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/277696' : ''
+    // baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/277696' : ''
+    baseURL: isDev ? 'http://192.168.100.12:8888' : ''
 })
 
 const service2 = axios.create({
-    baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/277696' : ''
+    // baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/277696' : ''
+    baseURL: isDev ? 'http://192.168.100.12:8888' : ''
 })
 
 service1.interceptors.request.use((config) => {

@@ -69,6 +69,7 @@ const StaffManagement: FC = (): ReactElement => {
     useEffect(() => {
         let result = []
         getUsersList().then((res: any) => {
+            console.log(res)
             if (res.code === 200) {
                 let result = handleTreeData(res.data)
                 dispatch({

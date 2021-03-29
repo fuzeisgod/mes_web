@@ -22,7 +22,8 @@ export default function Login(props: any) {
         if (remember) {
             localStorage.setItem('user', encryptAES(JSON.stringify({ ac: account, pwd: password })))
         }
-        login({ ac: encryptAES(account), pwd: encryptAES(password) }).then((res: any) => {
+        login({ ac: account, pwd: encryptAES(password) }).then((res: any) => {
+            console.log(res)
             if (res.bRes) {
                 localStorage.setItem('key', encryptAES(res.Ticket))
                 props.history.push('/')
