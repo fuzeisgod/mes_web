@@ -21,15 +21,15 @@ import './production_order.less'
 import { ISearch } from './typings'
 import moment from 'moment';
 import { getProductOrdersList, deleteProductOrder } from '../../api/product'
-import { getUsersList } from '../../api/staff'
 import { productOrderListReducer } from './reducer'
 import { ACTION_TYPE } from './typings'
+import { useUsers } from '../../hooks'
 
 const { RangePicker } = DatePicker
 
 const ProductionOrders: FC = (props: any): ReactElement => {
     const [form] = Form.useForm()
-
+    const [users, updateUsers] = useUsers([])
     const [_state, dispatch] = useReducer(productOrderListReducer, {
         tableData: [],
         page: 1,
@@ -41,12 +41,12 @@ const ProductionOrders: FC = (props: any): ReactElement => {
             endTime: null,
             chargeUserId: null
         },
-        userList: [],
         freshFlag: false
     })
 
     const onFinish = (values: ISearch) => {
         let { orderNo, chargeUserId, orderTime } = values;
+        console.log(chargeUserId)
         dispatch({
             type: ACTION_TYPE.SET_SEARCH_INFO,
             payload: {
@@ -96,7 +96,7 @@ const ProductionOrders: FC = (props: any): ReactElement => {
         { title: '计划完成时间', dataIndex: 'PlanTime', key: 'PlanTime' },
         { title: '是否加急', dataIndex: 'IsUrgent', key: 'IsUrgent' },
         { title: '订单负责人', dataIndex: 'ChargeUser', key: 'ChargeUser' },
-        { title: '操作', key: 'OrderAction', render: editRender },
+        { title: '操作', key: 'OrderAction', render: editRender, fixed: 'right' as 'right' },
     ]
 
     const expandedRowRender = (record) => {
@@ -109,11 +109,11 @@ const ProductionOrders: FC = (props: any): ReactElement => {
             { title: '计划完成时间', dataIndex: 'PlanTime', key: 'PlanTime' },
         ]
 
-        let data = record.Devices.map(item => ({
+        let data = record.Devices.map((item, index) => ({
             ...item,
-            CreateTime: moment(item.CreateTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
-            PlanTime: moment(item.PlanTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
-            key: item.SerialNo
+            CreateTime: moment(item.CreateTime).format('YYYY年 M月D日'),
+            PlanTime: moment(item.PlanTime).format('YYYY年 M月D日'),
+            key: index
         }))
 
         return <Table className="sub-table" bordered={true} columns={columns} dataSource={data} pagination={false} />;
@@ -132,8 +132,8 @@ const ProductionOrders: FC = (props: any): ReactElement => {
             if (res.code === 200) {
                 let n = res.data.map(item => ({
                     ...item,
-                    CreateTime: moment(item.CreateTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
-                    PlanTime: moment(item.PlanTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
+                    CreateTime: moment(item.CreateTime).format('YYYY年 M月D日'),
+                    PlanTime: moment(item.PlanTime).format('YYYY年 M月D日'),
                     ProductCount: item.Devices.length,
                     key: item.Id,
                     IsUrgent: item.isUrgent ? <span style={{ color: 'red' }}>加急</span> : <span style={{ color: 'green' }}>正常</span>
@@ -148,21 +148,6 @@ const ProductionOrders: FC = (props: any): ReactElement => {
             }
         })
     }, [_state.page, _state.limit, _state.searchInfo.orderNo, _state.searchInfo.startTime, _state.searchInfo.endTime, _state.searchInfo.chargeUserId, _state.freshFlag])
-
-    useEffect(() => {
-        getUsersList().then((res: any) => {
-            if (res.code === 200) {
-                let n = res.data.map(item => ({
-                    Name: item.Name,
-                    Id: item.Id
-                }))
-                dispatch({
-                    type: ACTION_TYPE.SET_USER_LIST,
-                    payload: n
-                })
-            }
-        })
-    }, [])
 
     return (
         <>
@@ -201,10 +186,13 @@ const ProductionOrders: FC = (props: any): ReactElement => {
                             />
                         </Form.Item>
                         <Form.Item label="订单责任人" name="chargeUserId">
-                            <Select style={{ width: '120px' }} allowClear>
+                            <Select
+                                style={{ width: '120px' }}
+                                allowClear
+                            >
                                 {
-                                    _state.userList.length !== 0 && _state.userList.map(item => {
-                                        return <Select.Option value={item.Id} key={item.Id}>{item.Name}</Select.Option>
+                                    users.length !== 0 && users.map(user => {
+                                        return <Select.Option value={user.Id} key={user.Id}>{user.Name}</Select.Option>
                                     })
                                 }
                             </Select>
@@ -220,6 +208,7 @@ const ProductionOrders: FC = (props: any): ReactElement => {
                         bordered={true}
                         columns={columns}
                         expandable={{ expandedRowRender }}
+                        footer={() => <div style={{ color: '#ffa39e', textAlign: 'right' }}>默认展示一周内的订单数据</div>}
                         dataSource={_state.tableData}
                         rowClassName={(record, index) => {
                             let className = 'light-row';

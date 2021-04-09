@@ -1,3 +1,6 @@
 export { default as Frame } from './Frame'
 export { default as PreviewForm } from './PreviewForm'
 export { default as Loading } from './Loading'
+export { default as UserSelect } from './UserSelect'
+export { default as DeviceTypesSelect } from './DeviceTypesSelect'
+export { default as PositionSelect } from './PositionSelect'

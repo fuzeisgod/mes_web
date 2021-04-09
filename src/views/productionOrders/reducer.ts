@@ -37,8 +37,6 @@ function productOrderListReducer(state: IState, action) {
                 endTime: payload.endTime || null,
                 chargeUserId: payload.chargeUserId || null
             }).toJS()
-        case ACTION_TYPE.SET_USER_LIST:
-            return _state.set('userList', payload).toJS()
         case ACTION_TYPE.CHANGE_FRESH_FLAG:
             return _state.set('freshFlag', !_state.get('freshFlag')).toJS()
         default:

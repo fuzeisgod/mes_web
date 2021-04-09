@@ -1,13 +1,20 @@
 export enum ACTION_TYPE {
     SET_COUNT = 'setCount',
-    SET_TYPES = 'setTypes',
     SET_TYPEID = 'setTypeId',
-    SET_PLANS = 'setPlans'
+    SET_PLANS = 'setPlans',
+    SET_MODE = 'setMode'
+}
+
+export enum MODE_TYPE {
+    CREATE = 0,
+    EDIT = 1
 }
 
 export interface IState {
     count: number,
-    types: any[],
     typeId: number,
-    plans: any[]
+    plans: any[],
+    mode: MODE_TYPE,
+    serialNo: number,
+    Id: number
 }

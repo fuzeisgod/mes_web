@@ -12,25 +12,30 @@ import {
     Table,
     message,
     Popconfirm,
-    Breadcrumb
+    Breadcrumb,
+    List
 } from 'antd'
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import arrayMove from 'array-move';
 import './form_configuration.less'
-import { MenuOutlined } from '@ant-design/icons';
+import { MenuOutlined, PlusOutlined } from '@ant-design/icons';
 import {
     PreviewForm
 } from '../../../../components'
 import { formOptionsReducer } from './reducer'
 import { ACTION_TYPE } from './typings'
-import { fromJS } from 'immutable'
 import { addMould } from '../../../../api/integratedconfig'
+import { usePositions, useDeviceTypes } from '../../../../hooks'
 
 
 const SortableItem = SortableElement(props => <tr {...props} />);
 const SortableList = SortableContainer(props => <tbody {...props} />);
+const { Option } = Select;
 
 export default function FormConfigurationAdd(props) {
+    const [positionList, updatePositionList] = usePositions([])
+    const [deviceTypeList, updateDeviceTypeList] = useDeviceTypes([])
+    const [needSelct, updateNeedSelect] = useState<boolean>(false)
 
     const DragHandle = SortableHandle(() => (
         <MenuOutlined style={{ cursor: 'pointer', color: '#999' }} />
@@ -58,20 +63,18 @@ export default function FormConfigurationAdd(props) {
     ]
 
     // reducer
-    const [state, dispatch] = useReducer(formOptionsReducer, fromJS({
+    const [state, dispatch] = useReducer(formOptionsReducer, {
         basicOptions: {},
         formProps: [],
         formPropsIndex: 0
-    }))
-
-    console.log(state.toJS())
+    })
 
     const [form1] = Form.useForm()
     const [form2] = Form.useForm()
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
         if (oldIndex !== newIndex) {
-            const newData = arrayMove([].concat(state.get("formProps")), oldIndex, newIndex).filter(el => !!el);
+            const newData = arrayMove([].concat(state.formProps), oldIndex, newIndex).filter(el => !!el);
             console.log('Sorted items: ', newData);
             dispatch({
                 type: ACTION_TYPE.SET_FORM_PROPS,
@@ -82,7 +85,7 @@ export default function FormConfigurationAdd(props) {
 
     const DraggableBodyRow = ({ className, style, ...restProps }) => {
         // function findIndex base on Table rowKey props and should always be a right array index
-        const index = state.get("formProps").findIndex(x => x.index === restProps['data-row-key']);
+        const index = state.formProps.findIndex(x => x.index === restProps['data-row-key']);
         return <SortableItem index={index} {...restProps} />;
     };
 
@@ -109,14 +112,13 @@ export default function FormConfigurationAdd(props) {
 
     // 工单基本配置提交
     const handleSaveOptions = () => {
-        let { form_name, form_abbreviation, belong_work, belong_step } = form1.getFieldsValue()
+        let { form_name, belong_work, device_type } = form1.getFieldsValue()
         dispatch({
             type: ACTION_TYPE.SET_BASIC_OPTIONS,
             payload: {
                 form_name,
-                form_abbreviation,
                 belong_work,
-                belong_step
+                device_type
             }
         })
     }
@@ -128,21 +130,23 @@ export default function FormConfigurationAdd(props) {
             item_submit_type,
             item_is_required,
             item_is_readonly,
-            item_span
+            item_span,
+            item_select_items
         } = form2.getFieldsValue()
         if (item_name && item_submit_type && item_span) {
             dispatch({
                 type: ACTION_TYPE.SET_FORM_PROPS,
                 payload: [
-                    ...state.get("formProps"),
+                    ...state.formProps,
                     {
                         item_name,
                         item_submit_type,
                         item_is_required,
                         item_is_readonly,
                         item_span,
-                        key: state.get("formPropsIndex"),
-                        index: state.get("formPropsIndex")
+                        item_select_items,
+                        key: state.formPropsIndex,
+                        index: state.formPropsIndex
                     }
                 ]
             })
@@ -152,15 +156,33 @@ export default function FormConfigurationAdd(props) {
         } else {
             message.warning("必要信息未填！")
         }
-
     }
 
     const handleSaveFormModel = () => {
-        addMould(JSON.stringify(state)).then((res: any) => {
+        if (!state.basicOptions.form_name || !state.basicOptions.belong_work || !state.basicOptions.device_type) return message.warn('工单基本配置未填写完整或未保存！')
+        if (state.formProps.length === 0) return message.warn('尚未添加工单子项！')
+        addMould({
+            Name: state.basicOptions.form_name,
+            TypeId: state.basicOptions.device_type,
+            PositionId: state.basicOptions.belong_work,
+            Mould: JSON.stringify(state)
+        }).then((res: any) => {
+            console.log(res)
             if (res.code === 200) {
                 message.success(res.msg)
             }
         })
+    }
+
+    const handleChange = (changedValues) => {
+        if (Object.hasOwnProperty.call(changedValues, 'item_submit_type')) {
+            console.log(changedValues)
+            const { item_submit_type } = changedValues
+            if (item_submit_type === 'select') {
+                return updateNeedSelect(true)
+            }
+            updateNeedSelect(false)
+        }
     }
 
     return (
@@ -199,14 +221,20 @@ export default function FormConfigurationAdd(props) {
                                         </Form.Item>
                                         <Form.Item label="所属岗位" name="belong_work">
                                             <Select style={{ width: '200px' }}>
-                                                <Select.Option value="1">1</Select.Option>
-                                                <Select.Option value="2">2</Select.Option>
+                                                {
+                                                    positionList.length > 0 && positionList.map(position => (
+                                                        <Select.Option key={position.Id} value={position.Id}>{position.Name}</Select.Option>
+                                                    ))
+                                                }
                                             </Select>
                                         </Form.Item>
                                         <Form.Item label="所属设备类型" name="device_type">
                                             <Select style={{ width: '200px' }}>
-                                                <Select.Option value="1">1</Select.Option>
-                                                <Select.Option value="2">2</Select.Option>
+                                                {
+                                                    deviceTypeList.length > 0 && deviceTypeList.map(deviceType => (
+                                                        <Select.Option key={deviceType.Id} value={deviceType.Id}>{deviceType.Name + '(' + deviceType.MaterialCode + ')'}</Select.Option>
+                                                    ))
+                                                }
                                             </Select>
                                         </Form.Item>
                                     </Form>
@@ -223,12 +251,13 @@ export default function FormConfigurationAdd(props) {
                                             ['item_is_required']: true,
                                             ['item_is_readonly']: false
                                         }}
+                                        onValuesChange={handleChange}
                                     >
                                         <Form.Item label="工单子项名称" name="item_name">
                                             <Input placeholder="请输入工单子项名称" />
                                         </Form.Item>
                                         <Form.Item label="工单子项输入形式" name="item_submit_type">
-                                            <Select style={{ width: '200px' }}>
+                                            <Select style={{ width: '200px' }} allowClear>
                                                 <Select.Option value="input">文字输入</Select.Option>
                                                 <Select.Option value="select">下拉选择</Select.Option>
                                                 <Select.Option value="upload">图片上传</Select.Option>
@@ -247,6 +276,14 @@ export default function FormConfigurationAdd(props) {
                                                 <Select.Option value="24">1 行</Select.Option>
                                             </Select>
                                         </Form.Item>
+                                        {
+                                            needSelct ?
+                                                <Form.Item label="下拉选项" name="item_select_items" style={{ width: '400px' }}>
+                                                    <Select mode="tags" style={{ width: '100%' }} placeholder="请输入选项后回车确认">
+                                                    </Select>
+                                                </Form.Item>
+                                                : null
+                                        }
                                     </Form>
                                 </Card>
                                 <Card
@@ -256,7 +293,7 @@ export default function FormConfigurationAdd(props) {
                                     <Table
                                         pagination={false}
                                         columns={columns}
-                                        dataSource={state.toJS().formProps}
+                                        dataSource={state.formProps}
                                         rowKey="index"
                                         bordered
                                         components={{
@@ -275,7 +312,7 @@ export default function FormConfigurationAdd(props) {
                                     title="工单预览"
                                     bodyStyle={{ padding: '0 25px 25px 25px' }}
                                 >
-                                    <PreviewForm basicOptions={state.toJS().basicOptions} formItemProps={state.toJS().formProps} />
+                                    <PreviewForm basicOptions={state.basicOptions} formItemProps={state.formProps} />
                                 </Card>
                             </Space>
                         </Col>

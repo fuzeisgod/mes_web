@@ -1,61 +1,93 @@
-import React from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import {
     Card,
     Form,
     Button,
     DatePicker,
     Input,
-    Select,
     Divider,
-    Table
+    Table,
+    Select
 } from 'antd'
-
+import { searchOrderBookByOptions } from '../../api/orderbook'
+import { ACTION_TYPE } from './typings'
+import { orderStandingBookReducer } from './reducer'
+import moment from 'moment'
+import { useUsers, usePositions } from '../../hooks'
 
 const { RangePicker } = DatePicker;
 
 export default function OrdersStandingBook() {
-    const search_work = (values: any) => {
-        console.log(values)
-    }
-
-    const dataSource = [
-        {
-            key: 1,
-            order_id: 123456,
-            work_id: 123456,
-            device_name: '局放',
-            man_name: 'Chen',
-            man_position: '安装',
-            check_time: '2020年1月1日'
-        },
-        {
-            key: 2,
-            order_id: 123456,
-            work_id: 123456,
-            device_name: '局放',
-            man_name: 'Chen',
-            man_position: '安装',
-            check_time: '2020年1月1日'
-        },
-        {
-            key: 3,
-            order_id: 123456,
-            work_id: 123456,
-            device_name: '局放',
-            man_name: 'Chen',
-            man_position: '安装',
-            check_time: '2020年1月1日'
+    const [form] = Form.useForm()
+    const [users, updateUsers] = useUsers([])
+    const [positions, updatePositions] = usePositions([])
+    const [_state, dispatch] = useReducer(orderStandingBookReducer, {
+        tableData: [],
+        total: 0,
+        searchInfo: {
+            limit: 10,
+            currentPage: 1,
         }
-    ]
+    })
 
     const columns = [
-        { title: '订单编号', dataIndex: 'order_id', key: 'order_id' },
-        { title: '工单单号', dataIndex: 'work_id', key: 'work_id' },
-        { title: '设备名称', dataIndex: 'device_name', key: 'device_name' },
-        { title: '填写人员', dataIndex: 'man_name', key: 'man_name' },
-        { title: '岗位', dataIndex: 'man_position', key: 'man_position' },
-        { title: '填写时间', dataIndex: 'check_time', key: 'check_time' }
+        { title: '生产订单编号', dataIndex: 'OrderNo', key: 'OrderNo' },
+        { title: '产品序列号', dataIndex: 'SerialNo', key: 'SerialNo' },
+        { title: 'TerminalID', dataIndex: 'TerminalId', key: 'TerminalId' },
+        { title: '产品名称', dataIndex: 'DeviceName', key: 'DeviceName' },
+        { title: '填写人员', dataIndex: 'UserName', key: 'UserName' },
+        { title: '岗位', dataIndex: 'PositionName', key: 'PositionName' },
+        { title: '填写时间', dataIndex: 'Time', key: 'Time' }
     ]
+
+    const search_work = (values: any) => {
+        let { SerialNo, TerminalId, Time, orderNo, positionId, userId } = values
+        console.log(positionId, userId)
+        let payload = {
+            startTime: Time ? moment(Time[0]).toJSON() : '',
+            endTime: Time ? moment(Time[1]).toJSON() : '',
+            orderNo,
+            userId,
+            positionId,
+            TerminalId,
+            SerialNo
+        }
+        dispatch({
+            type: ACTION_TYPE.SET_SEARCH_INFO,
+            payload
+        })
+    }
+
+    useEffect(() => {
+        console.log('search data')
+        searchOrderBookByOptions({
+            startTime: _state.searchInfo.startTime || '',
+            endTime: _state.searchInfo.endTime || '',
+            orderNo: _state.searchInfo.orderNo || '',
+            userId: _state.searchInfo.userId || '',
+            positionId: _state.searchInfo.positionId || '',
+            TerminalId: _state.searchInfo.TerminalId || '',
+            SerialNo: _state.searchInfo.SerialNo || '',
+            limit: _state.searchInfo.limit,
+            page: _state.searchInfo.currentPage
+        }).then((res: any) => {
+            if (res.code === 200) {
+                // console.log(res)
+                let n = res.data.map((item, index) => ({
+                    ...item,
+                    key: index,
+                    Time: moment(item.Time).format('YYYY年 M月D日'),
+                }))
+                dispatch({
+                    type: ACTION_TYPE.SET_TABLE_DATA,
+                    payload: {
+                        tableData: n,
+                        total: res.count
+                    }
+                })
+            }
+        })
+    }, [_state.searchInfo.startTime, _state.searchInfo.endTime, _state.searchInfo.orderNo, _state.searchInfo.userId, _state.searchInfo.positionId, _state.searchInfo.TerminalId, _state.searchInfo.SerialNo, _state.searchInfo.limit, _state.searchInfo.currentPage])
 
     return (
         <>
@@ -63,27 +95,43 @@ export default function OrdersStandingBook() {
                 <Form
                     layout="inline"
                     onFinish={search_work}
+                    form={form}
                 >
-                    <Form.Item label="时间范围">
+                    <Form.Item label="时间范围" name="Time">
                         <RangePicker />
                     </Form.Item>
-                    <Form.Item label="工单单号">
-                        <Input placeholder="请输入工单单号" />
+                    <Form.Item label="生产订单编号" name="orderNo">
+                        <Input placeholder="请输入生产订单编号" allowClear />
                     </Form.Item>
-                    <Form.Item label="员工姓名">
-                        <Select style={{ width: '120px' }}>
-                            <Select.Option value="zhangsan">张三</Select.Option>
-                            <Select.Option value="lisi">李四</Select.Option>
+                    <Form.Item label="产品序列号" name="SerialNo">
+                        <Input placeholder="请输入产品序列号" allowClear />
+                    </Form.Item>
+                    <Form.Item label="TerminalID" name="TerminalId">
+                        <Input placeholder="请输入TerminalID" allowClear />
+                    </Form.Item>
+                    <Form.Item label="员工姓名" name="userId">
+                        <Select
+                            style={{ width: '120px' }}
+                            allowClear
+                        >
+                            {
+                                users.length !== 0 && users.map(user => {
+                                    return <Select.Option value={user.Id} key={user.Id}>{user.Name}</Select.Option>
+                                })
+                            }
                         </Select>
                     </Form.Item>
-                    <Form.Item label="工作岗位">
-                        <Select style={{ width: '120px' }}>
-                            <Select.Option value="1">1</Select.Option>
-                            <Select.Option value="2">2</Select.Option>
+                    <Form.Item label="工作岗位" name="positionId">
+                        <Select
+                            style={{ width: '120px' }}
+                            allowClear
+                        >
+                            {
+                                positions.length > 0 && positions.map((position) => (
+                                    <Select.Option value={position.Id} key={position.Id}>{position.Name}</Select.Option>
+                                ))
+                            }
                         </Select>
-                    </Form.Item>
-                    <Form.Item label="订单查询">
-                        <Input placeholder="请输入订单单号" />
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">
@@ -93,11 +141,30 @@ export default function OrdersStandingBook() {
                 </Form>
                 <Divider />
                 <Table
-                    dataSource={dataSource}
+                    dataSource={_state.tableData}
                     columns={columns}
                     bordered
                     expandable={{
                         expandedRowRender: record => <p style={{ margin: 0 }}>{'这里是工单'}</p>,
+                    }}
+                    footer={() => <div style={{ color: '#ffa39e', textAlign: 'right' }}>默认展示一周内的工单数据</div>}
+                    pagination={{
+                        showSizeChanger: true,
+                        onShowSizeChange: (current, size) => {
+                            dispatch({
+                                type: ACTION_TYPE.SET_LIMIT_COUNT,
+                                payload: size
+                            })
+                        },
+                        onChange: (page, pageSize) => {
+                            dispatch({
+                                type: ACTION_TYPE.SET_CURRENT_PAGE,
+                                payload: page
+                            })
+                        },
+                        showTotal: total => `共 ${total} 条`,
+                        total: _state.total,
+                        pageSizeOptions: ['5', '10', '15', '20']
                     }}
                 />
             </Card>

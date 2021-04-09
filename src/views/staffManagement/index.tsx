@@ -14,7 +14,7 @@ import {
 } from 'antd'
 import { EditOutlined, UserOutlined } from '@ant-design/icons';
 import './staff_management.less';
-import { ACTION_TYPE, ITree, ITreeDataNode, ITreeNode } from './typings';
+import { ACTION_TYPE, ITree, ITreeNode } from './typings';
 import { treeReducer } from './reducer';
 import { getUsersList } from '../../api/staff'
 
@@ -45,33 +45,27 @@ const StaffManagement: FC = (): ReactElement => {
     }
 
     // 处理树结构返回数据
-    const handleTreeData = (treeData: ITreeDataNode[]): ITreeNode[] => {
-        let result = []
-        treeData.forEach((item1) => {
-            let children = []
-            item1.Users.forEach((item2) => {
-                children.push({
-                    title: item2.Name,
-                    key: 'u_' + item2.Id,
-                    id: item2.Id,
-                    icon: <UserOutlined />
-                })
-            })
-            result.push({
-                title: item1.Department,
-                key: 'd_' + item1.DepartId,
-                children: children
+    const handleTreeData = (treeData): ITreeNode[] => {
+        let children = []
+        treeData.forEach((item) => {
+            children.push({
+                title: item.Name,
+                key: item.Id,
+                id: item.Id,
+                icon: <UserOutlined />
             })
         })
-        return result
+        return children
     }
 
     useEffect(() => {
         let result = []
         getUsersList().then((res: any) => {
             console.log(res)
+            // debugger
             if (res.code === 200) {
                 let result = handleTreeData(res.data)
+                console.log(result)
                 dispatch({
                     type: ACTION_TYPE.GET_TREE,
                     payload: result

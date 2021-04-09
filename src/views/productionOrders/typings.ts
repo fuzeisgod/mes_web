@@ -17,7 +17,6 @@ export interface IState {
     limit: number;
     total: number;
     searchInfo: ISearchInfo;
-    userList: any[];
     freshFlag: boolean;
 }
 
@@ -26,6 +25,5 @@ export enum ACTION_TYPE {
     SET_CURRENT_PAGE = "setCurrentPage",
     SET_LIMIT_COUNT = "setLimitCount",
     SET_SEARCH_INFO = "setSearchInfo",
-    SET_USER_LIST = "setUserList",
     CHANGE_FRESH_FLAG = "changeFreshFlag"
 }

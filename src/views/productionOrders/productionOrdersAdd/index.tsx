@@ -5,7 +5,6 @@ import {
     Space,
     Form,
     Input,
-    InputNumber,
     DatePicker,
     Switch,
     Select,
@@ -20,20 +19,21 @@ import {
     ExclamationCircleOutlined
 } from '@ant-design/icons'
 import './production_order_add.less'
-import { addProductOrder, getDeviceListByOrderId, getProductOrderInfoByOrderId, upDateOrderInfo } from '../../../api/product'
-import { getUsersList } from '../../../api/staff'
+import { addProductOrder, getDeviceListByOrderId, getProductOrderInfoByOrderId, upDateOrderInfo, deleteDevice } from '../../../api/product'
 import { getSearchObj } from '../../../tools/index'
 import { productDeviceListReducer } from './reducer'
 import { ACTION_TYPE, MODE_TYPE } from './typings'
 import moment from 'moment'
+import { useUsers } from '../../../hooks'
 
 export default function ProductionOrdersAdd(props: any) {
     const [form] = Form.useForm()
+    const [users, updateUsers] = useUsers([])
     const [_state, dispatch] = useReducer(productDeviceListReducer, {
         tableData: [],
-        userList: [],
         mode: 0,
-        orderId: 0
+        orderId: 0,
+        freshFlag: false
     })
 
     const columns = [
@@ -44,10 +44,10 @@ export default function ProductionOrdersAdd(props: any) {
         { title: '开始时间', dataIndex: 'CreateTime', key: 'CreateTime' },
         { title: '计划完成时间', dataIndex: 'PlanTime', key: 'PlanTime' },
         {
-            title: '操作', key: 'orderAction', render: () => (
+            title: '操作', key: 'orderAction', render: (text, record) => (
                 <Space size={16}>
-                    <Button onClick={handleClickEdit} type="primary" size="small" shape="round">编辑</Button>
-                    <Popconfirm title="确认删除？" icon={<ExclamationCircleOutlined style={{ color: 'red' }} />} onConfirm={handleDelete}>
+                    <Button onClick={handleClickEdit.bind(null, record)} type="primary" size="small" shape="round">编辑</Button>
+                    <Popconfirm title="确认删除？" icon={<ExclamationCircleOutlined style={{ color: 'red' }} />} onConfirm={handleDelete.bind(null, record)}>
                         <Button danger type="primary" size="small" shape="round">删除</Button>
                     </Popconfirm>
                 </Space>
@@ -55,11 +55,22 @@ export default function ProductionOrdersAdd(props: any) {
         },
     ]
 
-    const handleClickEdit = () => {
-
+    const handleClickEdit = (record) => {
+        // console.log(record)
+        props.history.push('/' + 'my-userid' + '/po/edit_order/edit_work?SerialNo=' + record.SerialNo + '&orderId=' + _state.orderId + '&Id=' + record.Id + '&td=' + record.TerminalId)
     }
 
-    const handleDelete = () => {
+    const handleDelete = (record) => {
+        if (record.Id) {
+            deleteDevice(record.Id).then((res: any) => {
+                if (res.code === 200) {
+                    dispatch({
+                        type: ACTION_TYPE.CHANGE_FRESH_FLAG
+                    })
+                    message.success(res.msg)
+                }
+            })
+        }
 
     }
 
@@ -77,6 +88,7 @@ export default function ProductionOrdersAdd(props: any) {
             order_response_man,
             order_start_time
         } = form.getFieldsValue()
+        console.log(order_response_man)
         if (!order_finish_time || !order_id || !order_response_man || !order_start_time) {
             return message.warning('信息未填写完整！')
         }
@@ -128,18 +140,6 @@ export default function ProductionOrdersAdd(props: any) {
                 }
             })
         }
-        getUsersList().then((res: any) => {
-            if (res.code === 200) {
-                let n = res.data.map(item => ({
-                    Name: item.Name,
-                    Id: item.Id
-                }))
-                dispatch({
-                    type: ACTION_TYPE.SET_USER_LIST,
-                    payload: n
-                })
-            }
-        })
     }, [])
 
     // 2. getdata work
@@ -160,6 +160,8 @@ export default function ProductionOrdersAdd(props: any) {
             }
         })
 
+
+
         // get DeviceList by orderId
         getDeviceListByOrderId(_state.orderId).then((res: any) => {
             if (res.code === 200) {
@@ -167,12 +169,12 @@ export default function ProductionOrdersAdd(props: any) {
                     ...item,
                     CreateTime: moment(item.CreateTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
                     PlanTime: moment(item.PlanTime).format('YYYY年 MM月 DD日 HH:mm:ss'),
-                    key: item.SerialNo
+                    key: item.Id
                 }))
                 dispatch({ type: ACTION_TYPE.SET_DEVICE_LIST, payload })
             }
         })
-    }, [_state.orderId, _state.mode])
+    }, [_state.orderId, _state.mode, _state.freshFlag])
 
     return (
         <>
@@ -218,10 +220,13 @@ export default function ProductionOrdersAdd(props: any) {
                             <Switch checkedChildren="正常" unCheckedChildren="加急" className="order-form-switch" />
                         </Form.Item>
                         <Form.Item label="订单负责人" name="order_response_man">
-                            <Select style={{ width: '120px' }} allowClear>
+                            <Select
+                                style={{ width: '120px' }}
+                                allowClear
+                            >
                                 {
-                                    _state.userList.length !== 0 && _state.userList.map(item => {
-                                        return <Select.Option value={item.Id} key={item.Id}>{item.Name}</Select.Option>
+                                    users.length !== 0 && users.map(user => {
+                                        return <Select.Option value={user.Id} key={user.Id}>{user.Name}</Select.Option>
                                     })
                                 }
                             </Select>

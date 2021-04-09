@@ -9,90 +9,115 @@ import {
     Table,
     Input,
     Divider,
-    Breadcrumb
+    Breadcrumb,
+    message,
+    Popconfirm
 } from 'antd'
 import {
-    FolderOpenOutlined
+    ExclamationCircleOutlined
 } from '@ant-design/icons'
-import { getBomList } from '../../../api/integratedconfig'
+import { getBomList, deleteBom } from '../../../api/integratedconfig'
 import { dataSourceReducer } from './reducer'
 import { ACTION_TYPE } from './typings'
+import { useDeviceTypes } from '../../../hooks'
 
 export default function DeviceConfiguration(props) {
     const [form] = Form.useForm()
-    const [sProjectName, setSProjectName] = useState<string>("")
-    const [sCpspcode, setSCpspcode] = useState<string>("")
-    const [state, dispatch] = useReducer(dataSourceReducer, [])
+    const [deviceTypes, updateDeviceTypes] = useDeviceTypes([])
+    const [state, dispatch] = useReducer(dataSourceReducer, {
+        tableData: [],
+        searchInfo: {
+            limit: 10,
+            page: 1
+        },
+        total: 0,
+        freshFlag: false
+    })
 
     const columns = [
-        { title: '方案名称', dataIndex: 'customizename', key: 'customizename' },
-        { title: '母件编码', dataIndex: 'cpspcodeH', key: 'cpspcodeH' },
+        { title: '方案名称', dataIndex: 'Name', key: 'Name' },
         {
-            title: '操作', render: () => (
+            title: '设备类型', dataIndex: 'TypeId', key: 'TypeId', render: (text, record) => {
+                let target = []
+                if (deviceTypes.length > 0) {
+                    target = deviceTypes.filter(deviceType => {
+                        return deviceType.Id === record.TypeId
+                    })
+                }
+                return (
+                    <div>{target.length > 0 ? target[0].Name : ''}</div>
+                )
+            }
+        },
+        {
+            title: '操作', render: (text, record) => (
                 <Space size={16}>
-                    <Button type="primary" shape="round">编辑</Button>
-                    <Button type="primary" shape="round" danger>删除</Button>
+                    <Button size="small" shape="round" onClick={handlePreview.bind(null, record)}>预览</Button>
+                    <Popconfirm title="确认删除？" icon={<ExclamationCircleOutlined style={{ color: 'red' }} />} onConfirm={handleDelete.bind(null, record)}>
+                        <Button size="small" type="primary" shape="round" danger>删除</Button>
+                    </Popconfirm>
                 </Space>
             )
         },
     ]
 
-    const expandedRowRender = (e) => {
-        console.log(e)
-        const columns = [
-            // { title: '母件编码 *(cpspcode)H', dataIndex: 'cpspcodeH', key: 'cpspcodeH', width: 100 },
-            // { title: '母件名称 *(cinvname)H', dataIndex: 'cinvnameH', key: 'cinvnameH', width: 100 },
-            // { title: '规格型号(cinvstd)H', dataIndex: 'cinvstdH', key: 'cinvstdH', width: 100 },
-            // { title: '是否展开(bexpand)H', dataIndex: 'bexpandH', key: 'bexpandH', width: 100 },
-            // { title: '部门名称(cdepname)H', dataIndex: 'cdepnameH', key: 'cdepnameH', width: 100 },
-            // { title: '部门编码(cdepcode)H', dataIndex: 'cdepcodeH', key: 'cdepcodeH', width: 100 },
-            // { title: '默认成本BOM(bmrcbbom)H', dataIndex: 'bmrcbbomH', key: 'bmrcbbomH', width: 100 },
-            // { title: '版本号(csocode)H', dataIndex: 'csocodeH', key: 'csocodeH', width: 100 },
-            // { title: '备注(cmemo)H', dataIndex: 'cmemoH', key: 'cmemoH', width: 100 },
-            { title: '子件编码(cpscode)', dataIndex: 'cpscode', key: 'cpscode', width: 100 },
-            { title: '子件名称(cinvname)', dataIndex: 'cinvname', key: 'cinvname', width: 100 },
-            { title: '规格型号(cinvstd)', dataIndex: 'cinvstd', key: 'cinvstd', width: 150 },
-            // { title: '版本号(csocode)', dataIndex: 'csocode', key: 'csocode', width: 100 },
-            { title: '主计量(ccomunitname)', dataIndex: 'ccomunitname', key: 'ccomunitname', width: 100 },
-            { title: '基本用量分子(ipsquantity)', dataIndex: 'ipsquantity', key: 'ipsquantity', width: 200 },
-            { title: '基本用量分母(tdqtyd)', dataIndex: 'tdqtyd', key: 'tdqtyd', width: 200 },
-            // { title: '标准单价(fbzdj)', dataIndex: 'fbzdj', key: 'fbzdj', width: 150 },
-            // { title: '标准物料成本(fbzwlcb)', dataIndex: 'fbzwlcb', key: 'fbzwlcb', width: 200 },
-            // { title: '损耗率%(iwasterate)', dataIndex: 'iwasterate', key: 'iwasterate', width: 100 },
-            // { title: '存放仓库(cwhname)', dataIndex: 'cwhname', key: 'cwhname', width: 100 },
-            // { title: '库管员(cpersonname)', dataIndex: 'cpersonname', key: 'cpersonname', width: 100 },
-            // { title: '用料车间(usedept)', dataIndex: 'usedept', key: 'usedept', width: 100 },
-            // { title: '物料类型(wiptype)', dataIndex: 'wiptype', key: 'wiptype', width: 100 },
-            // { title: '替代标示(replaceflag)', dataIndex: 'replaceflag', key: 'replaceflag', width: 100 },
-            // { title: '图片(ginvpicture)', dataIndex: 'ginvpicture', key: 'ginvpicture', width: 100 },
-        ]
-
-        return <Table bordered={true} columns={columns} dataSource={[e]} pagination={false} />;
-    }
-
     const handleAdd = () => {
         props.history.push('/' + 'my-userid' + '/dc/add')
     }
 
+    const handlePreview = (record) => {
+        if (record.Id) {
+            props.history.push('/' + 'my-userid' + '/dc/add?bomprogrameId=' + record.Id)
+        }
+    }
+
+    const handleDelete = (record) => {
+        if (record.Id) {
+            deleteBom(record.Id).then((res: any) => {
+                if (res.code === 200) {
+                    message.success(res.msg)
+                    dispatch({
+                        type: ACTION_TYPE.CHANGE_FRESH_FLAG
+                    })
+                }
+            })
+        }
+    }
+
     const handleSearch = (values) => {
         let { bom_name, device_type } = values;
-        if (bom_name) setSProjectName(bom_name)
-        if (device_type) setSCpspcode(device_type)
+        let payload = {
+            typeId: device_type,
+            name: bom_name
+        }
+        dispatch({
+            type: ACTION_TYPE.SET_SEARCH_INFO,
+            payload
+        })
     }
 
     useEffect(() => {
         console.log('effct')
-        getBomList({ projectName: sProjectName, cpspcode: sCpspcode }).then((res: any) => {
-            console.log(res)
+        getBomList({
+            page: state.searchInfo.page,
+            limit: state.searchInfo.limit,
+            typeId: state.searchInfo.typeId || '',
+            name: state.searchInfo.name || ''
+        }).then((res: any) => {
             if (res.code === 200) {
-                let payload = res.data.map((item, index) => ({
+                let n = res.data.map((item, index) => ({
                     ...item,
                     key: index
                 }))
-                dispatch({ type: ACTION_TYPE.SET_DATA_SOURCE, payload })
+                dispatch({
+                    type: ACTION_TYPE.SET_TABLE_DATA, payload: {
+                        tableData: n,
+                        total: res.count
+                    }
+                })
             }
         })
-    }, [sProjectName, sCpspcode])
+    }, [state.searchInfo.page, state.searchInfo.limit, state.searchInfo.typeId, state.searchInfo.name, state.freshFlag])
 
     return (
         <>
@@ -116,12 +141,16 @@ export default function DeviceConfiguration(props) {
                 >
                     <Form form={form} layout="inline" onFinish={handleSearch}>
                         <Form.Item label="设备类型" name="device_type" className="form-item">
-                            <Select style={{ width: '400px' }}>
-                                <Select.Option value="02020103">智能防盗型保护接地箱（直立式）无监测(02020103)</Select.Option>
+                            <Select style={{ width: '200px' }} allowClear>
+                                {
+                                    deviceTypes.length > 0 && deviceTypes.map(deviceType => (
+                                        <Select.Option key={deviceType.Id} value={deviceType.Id}>{deviceType.Name + '(' + deviceType.MaterialCode + ')'}</Select.Option>
+                                    ))
+                                }
                             </Select>
                         </Form.Item>
                         <Form.Item label="方案名称" name="bom_name" className="form-item">
-                            <Input />
+                            <Input allowClear />
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit">
@@ -135,7 +164,29 @@ export default function DeviceConfiguration(props) {
                         bodyStyle={{ padding: 0 }}
                         bordered={false}
                     >
-                        <Table bordered columns={columns} dataSource={state} expandable={{ expandedRowRender }} />
+                        <Table
+                            bordered
+                            columns={columns}
+                            dataSource={state.tableData}
+                            pagination={{
+                                showSizeChanger: true,
+                                onShowSizeChange: (current, size) => {
+                                    dispatch({
+                                        type: ACTION_TYPE.SET_LIMIT_COUNT,
+                                        payload: size
+                                    })
+                                },
+                                onChange: (page, pageSize) => {
+                                    dispatch({
+                                        type: ACTION_TYPE.SET_CURRENT_PAGE,
+                                        payload: page
+                                    })
+                                },
+                                showTotal: total => `共 ${total} 条`,
+                                total: state.total,
+                                pageSizeOptions: ['5', '10', '15', '20']
+                            }}
+                        />
                     </Card>
                 </Card>
             </Space>

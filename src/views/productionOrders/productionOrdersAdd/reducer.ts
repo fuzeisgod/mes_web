@@ -6,9 +6,9 @@ import { fromJS } from 'immutable'
  * state:
  * {
  *      tableData: [],
- *      userList: [],
  *      mode,
- *      orderId: 0
+ *      orderId: 0,
+ *      freshFlag: false
  * }
  * 
  */
@@ -20,12 +20,12 @@ function productDeviceListReducer(state: IState, action) {
     switch (type) {
         case ACTION_TYPE.SET_DEVICE_LIST:
             return _state.set('tableData', payload).toJS()
-        case ACTION_TYPE.SET_USER_LIST:
-            return _state.set('userList', payload).toJS()
         case ACTION_TYPE.SET_MODE_TYPE:
             return _state.set('mode', payload.type).set('orderId', payload.orderId).toJS()
         case ACTION_TYPE.SET_ORDERID:
             return _state.set('orderId', payload).toJS()
+        case ACTION_TYPE.CHANGE_FRESH_FLAG:
+            return _state.set('freshFlag', !_state.get('freshFlag')).toJS()
         default:
             return _state.toJS()
     }

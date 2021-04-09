@@ -7,62 +7,118 @@ import {
     Select,
     Input,
     Divider,
-    Table
+    Table,
+    message,
+    Popconfirm
 } from 'antd'
+import {
+    ExclamationCircleOutlined
+} from '@ant-design/icons'
 import './form_configuration.less'
-import { getMouldList } from '../../../api/integratedconfig'
-import { useEffect, useReducer } from 'react'
+import { getMouldList, deleteMould } from '../../../api/integratedconfig'
+import React, { useEffect, useReducer, useState } from 'react'
 import { mouldListReducer } from './reducer'
 import { ACTION_TYPE } from './typings'
+import { PreviewForm } from '../../../components'
+import { useDeviceTypes, usePositions } from '../../../hooks'
 
 export default function FormConfiguration(props) {
     const [form] = Form.useForm()
+    const [positionList, updatePositionList] = usePositions([])
+    const [deviceTypeList, updateDeviceTypeList] = useDeviceTypes([])
 
-    const [state, dispatch] = useReducer(mouldListReducer, [])
+    const [state, dispatch] = useReducer(mouldListReducer, {
+        tableData: [],
+        searchInfo: {
+            limit: 10,
+            page: 1
+        },
+        total: 0,
+        freshFlag: false
+    })
 
     const handleAdd = () => {
         props.history.push('/' + 'my-userid' + '/fc/add')
     }
 
     const columns = [
-        { title: '模板名称', dataIndex: 'mouldName', key: 'mouldName' },
-        { title: '模板ID', dataIndex: 'typeId', key: 'typeId' },
-        { title: '岗位', dataIndex: 'position', key: 'position' },
-        { title: '设备类型', dataIndex: 'deviceType', key: 'deviceType' },
+        { title: '工单模板名称', dataIndex: 'Name', key: 'Name' },
+        { title: '岗位', dataIndex: 'PositionName', key: 'PositionName' },
+        { title: '设备类型', dataIndex: 'TypeName', key: 'TypeName' },
         {
-            title: '操作', render: () => (
+            title: '操作', render: (text, record) => (
                 <Space size={16}>
-                    <Button type="primary" shape="round">编辑</Button>
-                    <Button type="primary" shape="round" danger>删除</Button>
+                    <Button type="primary" shape="round" size="small" onClick={handleEdit.bind(null, record)}>编辑</Button>
+                    <Popconfirm title="确认删除？" icon={<ExclamationCircleOutlined style={{ color: 'red' }} />} onConfirm={handleDelete.bind(null, record)}>
+                        <Button type="primary" shape="round" danger size="small">删除</Button>
+                    </Popconfirm>
                 </Space>
             )
         },
     ]
 
+    const handleDelete = (record) => {
+        if (record.Id) {
+            deleteMould(record.Id).then((res: any) => {
+                if (res.code === 200) {
+                    message.success(res.msg)
+                    dispatch({
+                        type: ACTION_TYPE.CHANGE_FRESH_FLAG
+                    })
+                }
+            })
+        }
+    }
 
-    const handleSearch = () => {
+    const handleEdit = (record) => {
+        if (record.Id) {
+            props.history.push('/' + 'my-userid' + '/fc/add?Id=' + record.Id)
+        }
+    }
 
+    const handleSearch = (values) => {
+        const { typeId, positionId } = values
+        dispatch({
+            type: ACTION_TYPE.SET_SEARCH_INFO,
+            payload: {
+                typeId,
+                positionId
+            }
+        })
     }
 
     const expandedRowRender = (e) => {
-        console.log(e)
-        return <div>1</div>
+        if (e.Mould) {
+            let state = JSON.parse(e.Mould)
+            console.log(JSON.parse(e.Mould))
+            return <PreviewForm basicOptions={state.basicOptions} formItemProps={state.formProps} />
+        }
+        return null
     }
 
     useEffect(() => {
-        getMouldList().then((res: any) => {
+        console.log('effect')
+        getMouldList({
+            limit: state.searchInfo.limit,
+            page: state.searchInfo.page,
+            typeId: state.searchInfo.typeId || '',
+            positionId: state.searchInfo.positionId || ''
+        }).then((res: any) => {
             if (res.code === 200) {
-                let payload = res.data.map((item) => ({
+                let n = res.data.map((item) => ({
                     ...item,
-                    key: item.typeId
+                    key: item.Id
                 }))
                 dispatch({
                     type: ACTION_TYPE.SET_DATA_SOURCE,
-                    payload: payload
+                    payload: {
+                        tableData: n,
+                        total: res.count
+                    }
                 })
             }
         })
-    }, [])
+    }, [state.searchInfo.typeId, state.searchInfo.positionId, state.searchInfo.limit, state.searchInfo.page, state.freshFlag])
 
     return (
         <>
@@ -85,13 +141,23 @@ export default function FormConfiguration(props) {
                     }
                 >
                     <Form form={form} layout="inline" onFinish={handleSearch}>
-                        <Form.Item label="设备类型" name="device_type" className="form-item">
-                            <Select style={{ width: '400px' }}>
-                                <Select.Option value="02020103">智能防盗型保护接地箱（直立式）无监测(02020103)</Select.Option>
+                        <Form.Item label="设备类型" name="typeId" className="form-item">
+                            <Select style={{ width: '200px' }} allowClear>
+                                {
+                                    deviceTypeList.length > 0 && deviceTypeList.map(deviceType => (
+                                        <Select.Option key={deviceType.Id} value={deviceType.Id}>{deviceType.Name + '(' + deviceType.MaterialCode + ')'}</Select.Option>
+                                    ))
+                                }
                             </Select>
                         </Form.Item>
-                        <Form.Item label="方案名称" name="bom_name" className="form-item">
-                            <Input />
+                        <Form.Item label="岗位" name="positionId" className="form-item">
+                            <Select style={{ width: '200px' }} allowClear>
+                                {
+                                    positionList.length > 0 && positionList.map(position => (
+                                        <Select.Option key={position.Id} value={position.Id}>{position.Name}</Select.Option>
+                                    ))
+                                }
+                            </Select>
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit">
@@ -105,7 +171,30 @@ export default function FormConfiguration(props) {
                         bodyStyle={{ padding: 0 }}
                         bordered={false}
                     >
-                        <Table bordered columns={columns} dataSource={state} expandable={{ expandedRowRender }} />
+                        <Table
+                            bordered
+                            columns={columns}
+                            dataSource={state.tableData}
+                            expandable={{ expandedRowRender }}
+                            pagination={{
+                                showSizeChanger: true,
+                                onShowSizeChange: (current, size) => {
+                                    dispatch({
+                                        type: ACTION_TYPE.SET_LIMIT_COUNT,
+                                        payload: size
+                                    })
+                                },
+                                onChange: (page, pageSize) => {
+                                    dispatch({
+                                        type: ACTION_TYPE.SET_CURRENT_PAGE,
+                                        payload: page
+                                    })
+                                },
+                                showTotal: total => `共 ${total} 条`,
+                                total: state.total,
+                                pageSizeOptions: ['5', '10', '15', '20']
+                            }}
+                        />
                     </Card>
                 </Card>
             </Space>

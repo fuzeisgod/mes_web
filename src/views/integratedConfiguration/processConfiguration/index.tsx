@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Card,
     Button,
@@ -6,18 +6,25 @@ import {
     Space,
     Form,
     Select,
-    Breadcrumb
+    Breadcrumb,
+    Divider
 } from 'antd'
 import './process_configuration.less'
+import { getProgrammeList } from '../../../api/integratedconfig'
+import { useDeviceTypes } from '../../../hooks'
 
 export default function ProcessConfiguration(props) {
+    const [deviceTypes, updateDeviceTypes] = useDeviceTypes([])
+    const [typeId, updateTypeId] = useState(null)
+    const [programme, updateProgramme] = useState([])
+
     const columns = [
-        { title: '方案名称', dataIndex: 'plan_name', key: 'plan_name' },
-        { title: '设备类型', dataIndex: 'device_type', key: 'device_type' },
-        { title: '生产工单模板', dataIndex: 'module_s', key: 'module_s' },
-        { title: '质检工单模板', dataIndex: 'module_z', key: 'module_z' },
-        { title: '仓库工单模板', dataIndex: 'module_c', key: 'module_C' },
-        { title: 'bom模板', dataIndex: 'bom', key: 'bom' },
+        { title: '方案名称', dataIndex: 'Name', key: 'Name' },
+        { title: '设备类型', dataIndex: 'TypeName', key: 'TypeName' },
+        { title: '生产工单模板', dataIndex: 'ProducerMouldName', key: 'ProducerMouldName' },
+        { title: '质检工单模板', dataIndex: 'QualityInspectorMouldName', key: 'QualityInspectorMouldName' },
+        { title: '仓库工单模板', dataIndex: 'GodownKeeperMouldName', key: 'GodownKeeperMouldName' },
+        { title: 'bom模板', dataIndex: 'BomProgrammeName', key: 'BomProgrammeName' },
         {
             title: '操作', render: () => (
                 <Space size={16}>
@@ -29,30 +36,25 @@ export default function ProcessConfiguration(props) {
         },
     ]
 
-    const dataSource = [
-        {
-            key: 1,
-            plan_name: '综合方案一',
-            device_type: '接地箱',
-            module_s: '生产方案一',
-            module_z: '质检方案一',
-            module_c: '仓库方案一',
-            bom: 'bom方案一'
-        },
-        {
-            key: 2,
-            plan_name: '综合方案二',
-            device_type: '接地箱',
-            module_s: '生产方案二',
-            module_z: '质检方案二',
-            module_c: '仓库方案二',
-            bom: 'bom方案二'
-        },
-    ]
-
-
     const handleAdd = () => {
         props.history.push('/' + 'my-userid' + '/pc/add')
+    }
+
+    useEffect(() => {
+        let _typeId = typeId || '';
+        getProgrammeList(_typeId).then((res: any) => {
+            if (res.code === 200) {
+                let n = res.data.map(item => ({
+                    ...item,
+                    key: item.Id
+                }))
+                updateProgramme(n)
+            }
+        })
+    }, [typeId])
+
+    const handleChange = (changedFields) => {
+        if (changedFields.typeId) updateTypeId(changedFields.typeId)
     }
 
     return (
@@ -78,21 +80,25 @@ export default function ProcessConfiguration(props) {
                 >
                     <Form
                         layout="inline"
+                        onValuesChange={handleChange}
                     >
-                        <Form.Item label="选择设备类型">
-                            <Select style={{ width: '120px' }}>
-                                <Select.Option value="1">1</Select.Option>
-                                <Select.Option value="2">2</Select.Option>
+                        <Form.Item label="选择设备类型" name="typeId">
+                            <Select style={{ width: '200px' }} allowClear>
+                                {
+                                    deviceTypes.length > 0 && deviceTypes.map(deviceType => (
+                                        <Select.Option key={deviceType.Id} value={deviceType.Id}>{deviceType.Name + '(' + deviceType.MaterialCode + ')'}</Select.Option>
+                                    ))
+                                }
                             </Select>
                         </Form.Item>
                     </Form>
+                    <Divider />
                     <Card
-                        title="方案列表"
                         bodyStyle={{ padding: 0 }}
                         bordered={false}
                         headStyle={{ padding: 0, fontWeight: 'bold' }}
                     >
-                        <Table bordered columns={columns} dataSource={dataSource}></Table>
+                        <Table bordered columns={columns} dataSource={programme}></Table>
                     </Card>
 
                 </Card>

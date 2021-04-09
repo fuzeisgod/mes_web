@@ -66,3 +66,43 @@ export const addDevice = ({ num, OrderID, Name, PlanTime, CreateTime, TypeId, Pr
 export const getPlanList = (typeId) => {
     return service.post(`/api/Programme/GetProgrammes?typeId=${typeId}`)
 }
+
+// 根据序列号获取设备信息
+export const getDeviceInfoById = (Id) => {
+    return service.post(`/api/Device/GetDeviceById/${Id}`)
+}
+
+// 更新设备信息
+export const updateDevice = ({
+    Id,
+    SerialNo,
+    OrderID,
+    Name,
+    PlanTime,
+    CreateTime,
+    TerminalId,
+    TypeId,
+    ProgrammeId
+}) => {
+    return service.post('api/Device/UpdateDevice', {
+        Id,
+        SerialNo,
+        OrderID,
+        Name,
+        PlanTime,
+        CreateTime,
+        TerminalId,
+        TypeId,
+        ProgrammeId
+    })
+}
+
+// 删除设备
+export const deleteDevice = (deviceId) => {
+    return service.post(`/api/Device/DelDevice?deviceId=${deviceId}`)
+}
+
+// 根据ID获取设备类型
+export const getDeviceTypeById = (Id) => {
+    return service.post(`/api/Device/GetType/${Id}`)
+}

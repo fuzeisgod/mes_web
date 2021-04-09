@@ -3,21 +3,21 @@ import { fromJS } from 'immutable'
 
 const formOptionsReducer = (state, action) => {
     const { type, payload } = action
-
+    const _state = fromJS(state)
     switch (type) {
         case ACTION_TYPE.SET_BASIC_OPTIONS:
-            return state.set("basicOptions", payload)
+            return _state.set("basicOptions", payload).toJS()
         case ACTION_TYPE.SET_FORM_PROPS:
-            return state.set("formProps", payload)
+            return _state.set("formProps", payload).toJS()
         case ACTION_TYPE.ADD_FORM_PROPS_INDEX:
-            return state.set("formPropsIndex", state.get("formPropsIndex") + 1)
+            return _state.set("formPropsIndex", _state.get("formPropsIndex") + 1).toJS()
         case ACTION_TYPE.DELETE_FORM_PROP:
-            let target: number = state.get("formProps").findIndex((item) => {
+            let target: number = _state.get("formProps").findIndex((item) => {
                 return item.key === payload.key
             })
-            return state.set("formProps", fromJS(state.get('formProps')).delete(target))
+            return _state.set("formProps", _state.get('formProps').delete(target)).toJS()
         default:
-            return state
+            return _state.toJS()
     }
 }
 

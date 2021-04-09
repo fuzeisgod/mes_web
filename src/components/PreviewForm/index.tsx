@@ -7,15 +7,15 @@ import {
 } from 'antd'
 import './preview_form.less'
 
-export default function PreviewForm(props:any) {
-    // console.log(props)
+export default function PreviewForm(props: any) {
+    console.log(props)
     return (
         <>
-            <div className="form_title">{props.basicOptions.form_name || '表单名称'}</div>
+            <div className="form_title">{props.basicOptions.form_name || '工单名称'}</div>
             <Divider />
             <div className="form_content">
                 {
-                    props.formItemProps.map((itemProps:any, index:number) => (
+                    props.formItemProps.map((itemProps: any, index: number) => (
                         <div className="form_item" key={index} style={
                             (() => {
                                 switch (itemProps.item_span) {
@@ -39,8 +39,11 @@ export default function PreviewForm(props:any) {
                                                 case 'select':
                                                     return (
                                                         <Select style={{ width: '100%' }}>
-                                                            <Select.Option value="1">1</Select.Option>
-                                                            <Select.Option value="2">2</Select.Option>
+                                                            {
+                                                                itemProps.item_select_items.map((item, index) => (
+                                                                    <Select.Option key={index} value={index}>{item}</Select.Option>
+                                                                ))
+                                                            }
                                                         </Select>
                                                     )
                                                 case 'upload':

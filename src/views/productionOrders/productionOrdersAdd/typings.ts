@@ -1,8 +1,8 @@
 export enum ACTION_TYPE {
     SET_DEVICE_LIST = "setDeviceList",
-    SET_USER_LIST = "setUserList",
     SET_MODE_TYPE = "setModeType",
-    SET_ORDERID = "setOrderId"
+    SET_ORDERID = "setOrderId",
+    CHANGE_FRESH_FLAG = "changeFreshFlag"
 }
 
 export enum MODE_TYPE {
@@ -12,7 +12,7 @@ export enum MODE_TYPE {
 
 export interface IState {
     tableData: any[],
-    userList: any[],
     mode: number,
-    orderId: number
+    orderId: number,
+    freshFlag: boolean
 }
