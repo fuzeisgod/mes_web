@@ -19,6 +19,8 @@ service1.interceptors.request.use((config) => {
         config.headers['Authorization'] = 'BasicAuth ' + decryptAES(localStorage.getItem('key')) // 让每个请求携带自定义token 请根据实际情况自行修改
     }
     return config
+}, err => {
+    return Promise.reject(err)
 })
 
 
@@ -29,6 +31,8 @@ service1.interceptors.response.use((res) => {
         // 全局处理错误
         message.info('connection timed out!');
     }
+}, err => {
+    return Promise.reject(err)
 })
 
 service2.interceptors.response.use((res) => {
@@ -38,6 +42,8 @@ service2.interceptors.response.use((res) => {
         // 全局处理错误
         message.info('connection timed out!');
     }
+}, err => {
+    return Promise.reject(err)
 })
 
 export {

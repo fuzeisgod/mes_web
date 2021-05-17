@@ -26,9 +26,9 @@ export default function ProcessConfiguration(props) {
         { title: '仓库工单模板', dataIndex: 'GodownKeeperMouldName', key: 'GodownKeeperMouldName' },
         { title: 'bom模板', dataIndex: 'BomProgrammeName', key: 'BomProgrammeName' },
         {
-            title: '操作', render: () => (
+            title: '操作', render: (record) => (
                 <Space size={16}>
-                    <Button size="small" shape="round" type="primary">编辑</Button>
+                    <Button size="small" shape="round" type="primary" onClick={handleEdit.bind(null, record)}>编辑</Button>
                     <Button size="small" shape="round" type="default">预览</Button>
                     <Button size="small" shape="round" danger type="primary">删除</Button>
                 </Space>
@@ -38,6 +38,10 @@ export default function ProcessConfiguration(props) {
 
     const handleAdd = () => {
         props.history.push('/' + 'my-userid' + '/pc/add')
+    }
+
+    const handleEdit = (record) => {
+        props.history.push('/' + 'my-userid' + '/pc/add?Id=' + record.Id)
     }
 
     useEffect(() => {

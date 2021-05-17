@@ -10,8 +10,9 @@ import {
     message
 } from 'antd'
 import './process_configuration_add.less'
-import { getBomPropsByTypeId, getMouldByTypeIdAndPositionId, addProgramme } from '../../../../api/integratedconfig'
+import { getBomPropsByTypeId, getMouldByTypeIdAndPositionId, addProgramme, getProgrammeById, updateProgramme } from '../../../../api/integratedconfig'
 import { useDeviceTypes } from '../../../../hooks'
+import { getSearchObj } from '../../../../tools'
 
 const ProcessConfigurationAdd = (props) => {
     const [deviceTypes, updateDeviceTypes] = useDeviceTypes([])
@@ -31,18 +32,35 @@ const ProcessConfigurationAdd = (props) => {
     const handleSave = () => {
         let { name, typeId, bom, product, test, store } = form1.getFieldsValue()
         if (!name || !typeId || !bom || !product || !test || !store) return message.warn('信息未填写完整!')
-        addProgramme({
-            Name: name,
-            BomProgrammeId: bom,
-            ProducerMouldId: product,
-            QualityInspectorMouldId: test,
-            GodownKeeperMouldId: store,
-            TypeId: typeId
-        }).then((res: any) => {
-            if (res.code == 200) {
-                message.success(res.msg)
-            }
-        })
+        if (props.location.search) { // edit mode
+            let { Id } = getSearchObj(props.location.search)
+            updateProgramme({
+                Id,
+                Name: name,
+                BomProgrammeId: bom,
+                ProducerMouldId: product,
+                QualityInspectorMouldId: test,
+                GodownKeeperMouldId: store,
+                TypeId: typeId
+            }).then((res: any) => {
+                if (res.code == 200) {
+                    message.success(res.msg)
+                }
+            })
+        } else { // create mode
+            addProgramme({
+                Name: name,
+                BomProgrammeId: bom,
+                ProducerMouldId: product,
+                QualityInspectorMouldId: test,
+                GodownKeeperMouldId: store,
+                TypeId: typeId
+            }).then((res: any) => {
+                if (res.code == 200) {
+                    message.success(res.msg)
+                }
+            })
+        }
     }
 
     useEffect(() => {
@@ -64,6 +82,27 @@ const ProcessConfigurationAdd = (props) => {
             if (res.code === 200) updateStores(res.data)
         })
     }, [typeId])
+
+    useEffect(() => {
+        if (props.location.search) {
+            let { Id } = getSearchObj(props.location.search)
+            Id && getProgrammeById(Id).then((res: any) => {
+                console.log(res)
+                if (res.code === 200) {
+                    let { Name, TypeId, BomProgrammeId, ProducerMouldId, QualityInspectorMouldId, GodownKeeperMouldId } = res.data[0]
+                    form1.setFieldsValue({
+                        name: Name,
+                        typeId: TypeId,
+                        bom: BomProgrammeId,
+                        product: ProducerMouldId,
+                        test: QualityInspectorMouldId,
+                        store: GodownKeeperMouldId
+                    })
+                    updateTypeId(TypeId)
+                }
+            })
+        }
+    }, [])
 
     return (
         <>
@@ -90,7 +129,7 @@ const ProcessConfigurationAdd = (props) => {
                     }
                 >
                     <Form form={form1} onValuesChange={handleChange}>
-                        <Form.Item label="设备类型" name="name">
+                        <Form.Item label="方案名称" name="name">
                             <Input placeholder="请输入方案名称" style={{ width: '250px' }} />
                         </Form.Item>
                         <Form.Item label="设备类型" name="typeId">

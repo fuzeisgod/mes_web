@@ -22,6 +22,7 @@ const CheckFormDetail = (props) => {
     const handleCheck = () => {
 
     }
+    
     return (
         <>
             <Space direction="vertical" size={8} style={{ width: '100%' }}>
@@ -36,6 +37,7 @@ const CheckFormDetail = (props) => {
                         </Breadcrumb.Item>
                     </Breadcrumb>
                 </div>
+
                 <Card title="送检单详情" headStyle={{ fontWeight: 'bold' }} bodyStyle={{ padding: '2px 16px 14px 16px', background: '#FAFAFA' }} extra={
                     <Space size={16}>
                         <Popconfirm placement="left" title={() => (

@@ -11,11 +11,15 @@ const formOptionsReducer = (state, action) => {
             return _state.set("formProps", payload).toJS()
         case ACTION_TYPE.ADD_FORM_PROPS_INDEX:
             return _state.set("formPropsIndex", _state.get("formPropsIndex") + 1).toJS()
+        case ACTION_TYPE.SET_FORM_PROPS_INDEX:
+            return _state.set("formPropsIndex", payload).toJS()
         case ACTION_TYPE.DELETE_FORM_PROP:
-            let target: number = _state.get("formProps").findIndex((item) => {
+            let target: number = _state.get("formProps").toJS().findIndex((item) => {
                 return item.key === payload.key
             })
             return _state.set("formProps", _state.get('formProps').delete(target)).toJS()
+        case ACTION_TYPE.CHANGE_MODE:
+            return _state.set('mode', payload).toJS()
         default:
             return _state.toJS()
     }

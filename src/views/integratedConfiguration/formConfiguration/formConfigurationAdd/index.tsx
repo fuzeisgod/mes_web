@@ -18,14 +18,15 @@ import {
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import arrayMove from 'array-move';
 import './form_configuration.less'
-import { MenuOutlined, PlusOutlined } from '@ant-design/icons';
+import { MenuOutlined } from '@ant-design/icons';
 import {
     PreviewForm
 } from '../../../../components'
 import { formOptionsReducer } from './reducer'
-import { ACTION_TYPE } from './typings'
-import { addMould } from '../../../../api/integratedconfig'
+import { ACTION_TYPE, MODE_TYPE, INPUT_TYPE } from './typings'
+import { addMould, getMouldById, updateMould } from '../../../../api/integratedconfig'
 import { usePositions, useDeviceTypes } from '../../../../hooks'
+import { getSearchObj } from '../../../../tools';
 
 
 const SortableItem = SortableElement(props => <tr {...props} />);
@@ -36,6 +37,15 @@ export default function FormConfigurationAdd(props) {
     const [positionList, updatePositionList] = usePositions([])
     const [deviceTypeList, updateDeviceTypeList] = useDeviceTypes([])
     const [needSelct, updateNeedSelect] = useState<boolean>(false)
+    const [form1] = Form.useForm()
+    const [form2] = Form.useForm()
+    // reducer
+    const [state, dispatch] = useReducer(formOptionsReducer, {
+        basicOptions: {},
+        formProps: [],
+        formPropsIndex: 0,
+        mode: null
+    })
 
     const DragHandle = SortableHandle(() => (
         <MenuOutlined style={{ cursor: 'pointer', color: '#999' }} />
@@ -47,7 +57,7 @@ export default function FormConfigurationAdd(props) {
         {
             title: '操作', width: 150, render: (text, record) => (
                 <Space size={16}>
-                    <Button type="default" size="small" shape="round" onClick={handleEditFormProps.bind(null, record)}>编辑</Button>
+                    {/* <Button type="default" size="small" shape="round" onClick={handleEditFormProps.bind(null, record)}>编辑</Button> */}
                     <Popconfirm
                         placement="right"
                         title="确定要删除该项？"
@@ -62,20 +72,10 @@ export default function FormConfigurationAdd(props) {
         },
     ]
 
-    // reducer
-    const [state, dispatch] = useReducer(formOptionsReducer, {
-        basicOptions: {},
-        formProps: [],
-        formPropsIndex: 0
-    })
-
-    const [form1] = Form.useForm()
-    const [form2] = Form.useForm()
-
     const onSortEnd = ({ oldIndex, newIndex }) => {
         if (oldIndex !== newIndex) {
             const newData = arrayMove([].concat(state.formProps), oldIndex, newIndex).filter(el => !!el);
-            console.log('Sorted items: ', newData);
+            // console.log('Sorted items: ', newData);
             dispatch({
                 type: ACTION_TYPE.SET_FORM_PROPS,
                 payload: newData
@@ -127,6 +127,7 @@ export default function FormConfigurationAdd(props) {
     const handleAddItem = () => {
         const {
             item_name,
+            item_description,
             item_submit_type,
             item_is_required,
             item_is_readonly,
@@ -140,6 +141,7 @@ export default function FormConfigurationAdd(props) {
                     ...state.formProps,
                     {
                         item_name,
+                        item_description,
                         item_submit_type,
                         item_is_required,
                         item_is_readonly,
@@ -161,29 +163,93 @@ export default function FormConfigurationAdd(props) {
     const handleSaveFormModel = () => {
         if (!state.basicOptions.form_name || !state.basicOptions.belong_work || !state.basicOptions.device_type) return message.warn('工单基本配置未填写完整或未保存！')
         if (state.formProps.length === 0) return message.warn('尚未添加工单子项！')
-        addMould({
-            Name: state.basicOptions.form_name,
-            TypeId: state.basicOptions.device_type,
-            PositionId: state.basicOptions.belong_work,
-            Mould: JSON.stringify(state)
-        }).then((res: any) => {
-            console.log(res)
-            if (res.code === 200) {
-                message.success(res.msg)
-            }
-        })
+        if (state.mode === MODE_TYPE.CREATE) {
+            addMould({
+                Name: state.basicOptions.form_name,
+                TypeId: state.basicOptions.device_type,
+                PositionId: state.basicOptions.belong_work,
+                Mould: JSON.stringify(state)
+            }).then((res: any) => {
+                if (res.code === 200) {
+                    message.success(res.msg)
+                }
+            })
+        } else if (state.mode === MODE_TYPE.EDIT) {
+            let { Id } = getSearchObj(props.location.search)
+            if (!Id) return
+            updateMould({
+                Id,
+                Name: state.basicOptions.form_name,
+                TypeId: state.basicOptions.device_type,
+                PositionId: state.basicOptions.belong_work,
+                Mould: JSON.stringify(state)
+            }).then((res: any) => {
+                if (res.code === 200) {
+                    message.success(res.msg)
+                }
+            })
+        }
+
     }
 
     const handleChange = (changedValues) => {
         if (Object.hasOwnProperty.call(changedValues, 'item_submit_type')) {
-            console.log(changedValues)
             const { item_submit_type } = changedValues
-            if (item_submit_type === 'select') {
+            if (item_submit_type === INPUT_TYPE.SELECT) {
                 return updateNeedSelect(true)
             }
             updateNeedSelect(false)
         }
     }
+
+    useEffect(() => {
+        if (props.location.search) { // edit mode
+            let { Id } = getSearchObj(props.location.search)
+            dispatch({
+                type: ACTION_TYPE.CHANGE_MODE,
+                payload: MODE_TYPE.EDIT
+            })
+            Id && getMouldById(Id).then((res: any) => {
+                if (res.code === 200) {
+                    let { Name, PositionId, TypeId, Mould } = res.data[0]
+                    let { formProps } = JSON.parse(Mould)
+                    form1.setFieldsValue({
+                        form_name: Name,
+                        belong_work: PositionId,
+                        device_type: TypeId
+                    })
+                    dispatch({
+                        type: ACTION_TYPE.SET_FORM_PROPS_INDEX,
+                        payload: formProps.length
+                    })
+                    dispatch({
+                        type: ACTION_TYPE.SET_BASIC_OPTIONS,
+                        payload: {
+                            form_name: Name,
+                            belong_work: PositionId,
+                            device_type: TypeId
+                        }
+                    })
+                    dispatch({
+                        type: ACTION_TYPE.SET_FORM_PROPS,
+                        payload: formProps
+                    })
+                }
+            })
+        } else { // create mode
+            dispatch({
+                type: ACTION_TYPE,
+                payload: MODE_TYPE.CREATE
+            })
+        }
+    }, [])
+
+    const isForm1BtnValiable = useMemo(() => {
+        if (!state.basicOptions.form_name || !state.basicOptions.belong_work || !state.basicOptions.device_type) {
+            return true
+        }
+        return false
+    }, [state.basicOptions.form_name, state.basicOptions.belong_work, state.basicOptions.device_type])
 
     return (
         <>
@@ -210,7 +276,7 @@ export default function FormConfigurationAdd(props) {
                                 <Card
                                     title="工单基本配置"
                                     bodyStyle={{ padding: '12px 20px' }}
-                                    extra={<Button type='primary' shape="round" onClick={handleSaveOptions}>提交保存</Button>}
+                                    extra={<Button type='primary' shape="round" onClick={handleSaveOptions} disabled={isForm1BtnValiable}>提交保存</Button>}
                                 >
                                     <Form
                                         layout="inline"
@@ -256,11 +322,15 @@ export default function FormConfigurationAdd(props) {
                                         <Form.Item label="工单子项名称" name="item_name">
                                             <Input placeholder="请输入工单子项名称" />
                                         </Form.Item>
+                                        <Form.Item label="工单子项描述" name="item_description" style={{ width: '350px' }}>
+                                            <Input placeholder="请输入工单子项描述内容" allowClear/>
+                                        </Form.Item>
                                         <Form.Item label="工单子项输入形式" name="item_submit_type">
                                             <Select style={{ width: '200px' }} allowClear>
-                                                <Select.Option value="input">文字输入</Select.Option>
-                                                <Select.Option value="select">下拉选择</Select.Option>
-                                                <Select.Option value="upload">图片上传</Select.Option>
+                                                <Select.Option value={INPUT_TYPE.INPUT}>文字输入</Select.Option>
+                                                <Select.Option value={INPUT_TYPE.SELECT}>下拉选择</Select.Option>
+                                                <Select.Option value={INPUT_TYPE.UPLOAD}>图片上传</Select.Option>
+                                                <Select.Option value={INPUT_TYPE.CHECK}>确认框</Select.Option>
                                             </Select>
                                         </Form.Item>
                                         <Form.Item label="是否必填" name="item_is_required" valuePropName="checked">

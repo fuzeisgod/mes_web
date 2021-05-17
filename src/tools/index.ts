@@ -63,3 +63,7 @@ export const getDataSource = (json) => {
 
     return target
 }
+
+export const transformBase64ToPicture = (base64Str) => {
+
+}

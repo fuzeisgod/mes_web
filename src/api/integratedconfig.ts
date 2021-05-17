@@ -4,6 +4,7 @@ export const getBomList = ({ page, limit, typeId, name }) => {
     return service.post(`/api/Bom/GetBomPros?page=${page}&limit=${limit}&typeId=${typeId}&name=${name}`)
 }
 
+// 添加 mould
 export const addMould = ({ Name, TypeId, PositionId, Mould }) => {
     return service.post(`/api/Mould/AddMould`, {
         Name,
@@ -73,4 +74,46 @@ export const addProgramme = ({
         GodownKeeperMouldId,
         TypeId
     })
+}
+
+// 编辑方案
+export const updateProgramme = ({
+    Id,
+    Name,
+    BomProgrammeId,
+    ProducerMouldId,
+    QualityInspectorMouldId,
+    GodownKeeperMouldId,
+    TypeId
+}) => {
+    return service.post(`/api/Programme/UpdateProgramme`, {
+        Id,
+        Name,
+        BomProgrammeId,
+        ProducerMouldId,
+        QualityInspectorMouldId,
+        GodownKeeperMouldId,
+        TypeId
+    })
+}
+
+// 根据 Id 获取模板
+export const getMouldById = (Id) => {
+    return service.get(`/api/Mould/GetMould/${Id}`)
+}
+
+// 更新 mould
+export const updateMould = ({ Id, Name, TypeId, PositionId, Mould }) => {
+    return service.post(`/api/Mould/UpdateMould`, {
+        Id,
+        Name,
+        TypeId,
+        PositionId,
+        Mould
+    })
+}
+
+// 根据Id获取方案列表
+export const getProgrammeById = (Id) => {
+    return service.post(`/api/Programme/GetProgramme/${Id}`)
 }

@@ -14,6 +14,7 @@ import { ACTION_TYPE } from './typings'
 import { orderStandingBookReducer } from './reducer'
 import moment from 'moment'
 import { useUsers, usePositions } from '../../hooks'
+import { PreviewForm } from '../../components'
 
 const { RangePicker } = DatePicker;
 
@@ -42,7 +43,6 @@ export default function OrdersStandingBook() {
 
     const search_work = (values: any) => {
         let { SerialNo, TerminalId, Time, orderNo, positionId, userId } = values
-        console.log(positionId, userId)
         let payload = {
             startTime: Time ? moment(Time[0]).toJSON() : '',
             endTime: Time ? moment(Time[1]).toJSON() : '',
@@ -59,7 +59,6 @@ export default function OrdersStandingBook() {
     }
 
     useEffect(() => {
-        console.log('search data')
         searchOrderBookByOptions({
             startTime: _state.searchInfo.startTime || '',
             endTime: _state.searchInfo.endTime || '',
@@ -71,8 +70,8 @@ export default function OrdersStandingBook() {
             limit: _state.searchInfo.limit,
             page: _state.searchInfo.currentPage
         }).then((res: any) => {
+            console.log(res)
             if (res.code === 200) {
-                // console.log(res)
                 let n = res.data.map((item, index) => ({
                     ...item,
                     key: index,
@@ -145,7 +144,11 @@ export default function OrdersStandingBook() {
                     columns={columns}
                     bordered
                     expandable={{
-                        expandedRowRender: record => <p style={{ margin: 0 }}>{'这里是工单'}</p>,
+                        expandedRowRender: record => {
+                            let formProps = JSON.parse(record.Content)
+                            console.log(JSON.parse(record.Content))
+                            return <PreviewForm basicOptions={null} formItemProps={formProps} />
+                        },
                     }}
                     footer={() => <div style={{ color: '#ffa39e', textAlign: 'right' }}>默认展示一周内的工单数据</div>}
                     pagination={{
