@@ -22,7 +22,7 @@ import { ACTION_TYPE } from './typings'
 import { PreviewForm } from '../../../components'
 import { useDeviceTypes, usePositions } from '../../../hooks'
 
-export default function FormConfiguration(props) {
+export default function FormConfiguration(props:any) {
     const [form] = Form.useForm()
     const [positionList, updatePositionList] = usePositions([])
     const [deviceTypeList, updateDeviceTypeList] = useDeviceTypes([])

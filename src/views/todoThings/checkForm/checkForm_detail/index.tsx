@@ -3,7 +3,7 @@ import React from 'react'
 import './check_form_detail.less'
 import { PreviewForm } from '../../../../components'
 
-const CheckFormDetail = (props) => {
+const CheckFormDetail = (props:any) => {
 
     const columns = [
         { title: '产品序列号', dataIndex: 'device_order', key: 'device_order' },

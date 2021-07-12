@@ -22,15 +22,17 @@ export default function Login(props: any) {
         if (remember) {
             localStorage.setItem('user', encryptAES(JSON.stringify({ ac: account, pwd: password })))
         }
-        login({ ac: account, pwd: encryptAES(password) }).then((res: any) => {
-            console.log(res)
-            if (res.bRes) {
-                localStorage.setItem('key', encryptAES(res.Ticket))
-                props.history.push('/')
-            } else {
-                message.error('login error!');
-            }
-        })
+        localStorage.setItem('key', 'test')
+        props.history.push('/')
+        // login({ ac: account, pwd: encryptAES(password) }).then((res: any) => {
+        //     console.log(res)
+        //     if (res.bRes) {
+        //         localStorage.setItem('key', encryptAES(res.Ticket))
+        //         props.history.push('/')
+        //     } else {
+        //         message.error('login error!');
+        //     }
+        // })
     }
 
     useEffect(() => {

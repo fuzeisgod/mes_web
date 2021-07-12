@@ -14,4 +14,9 @@ module.exports = {
       },
     },
   ],
+  babel: {
+    plugins: [
+      "react-activation/babel"
+    ]
+  },
 };

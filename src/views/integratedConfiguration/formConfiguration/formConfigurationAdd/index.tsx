@@ -33,7 +33,7 @@ const SortableItem = SortableElement(props => <tr {...props} />);
 const SortableList = SortableContainer(props => <tbody {...props} />);
 const { Option } = Select;
 
-export default function FormConfigurationAdd(props) {
+export default function FormConfigurationAdd(props:any) {
     const [positionList, updatePositionList] = usePositions([])
     const [deviceTypeList, updateDeviceTypeList] = useDeviceTypes([])
     const [needSelct, updateNeedSelect] = useState<boolean>(false)

@@ -22,7 +22,7 @@ const initialState: ITree = {
     treeData: []
 };
 
-const StaffManagement: FC = (): ReactElement => {
+const StaffManagement: FC<any> = (props): ReactElement => {
     const [form] = Form.useForm()
     const [isEditMode, setIsEditMode] = useState<boolean>(false)
 

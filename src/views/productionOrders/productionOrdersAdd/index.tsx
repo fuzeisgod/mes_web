@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 import {
     Card,
     Button,
@@ -12,11 +12,15 @@ import {
     Table,
     Breadcrumb,
     message,
-    Popconfirm
+    Popconfirm,
+    Modal,
+    Carousel,
+    InputNumber
 } from 'antd'
 import {
     PlusOutlined,
-    ExclamationCircleOutlined
+    ExclamationCircleOutlined,
+    PrinterOutlined
 } from '@ant-design/icons'
 import './production_order_add.less'
 import { addProductOrder, getDeviceListByOrderId, getProductOrderInfoByOrderId, upDateOrderInfo, deleteDevice } from '../../../api/product'
@@ -25,15 +29,20 @@ import { productDeviceListReducer } from './reducer'
 import { ACTION_TYPE, MODE_TYPE } from './typings'
 import moment from 'moment'
 import { useUsers } from '../../../hooks'
+import { useLocation } from 'react-router-dom'
 
 export default function ProductionOrdersAdd(props: any) {
+    const location = useLocation()
     const [form] = Form.useForm()
     const [users, updateUsers] = useUsers([])
+    const [isModalVisible, updateIsModalVisible] = useState<boolean>(false)
+    // const refBarContainer = useRef<HTMLCanvasElement>(null)
     const [_state, dispatch] = useReducer(productDeviceListReducer, {
         tableData: [],
         mode: 0,
         orderId: 0,
-        freshFlag: false
+        freshFlag: false,
+        selectRows: []
     })
 
     const columns = [
@@ -56,7 +65,6 @@ export default function ProductionOrdersAdd(props: any) {
     ]
 
     const handleClickEdit = (record) => {
-        // console.log(record)
         props.history.push('/' + 'my-userid' + '/po/edit_order/edit_work?SerialNo=' + record.SerialNo + '&orderId=' + _state.orderId + '&Id=' + record.Id + '&td=' + record.TerminalId)
     }
 
@@ -88,7 +96,6 @@ export default function ProductionOrdersAdd(props: any) {
             order_response_man,
             order_start_time
         } = form.getFieldsValue()
-        console.log(order_response_man)
         if (!order_finish_time || !order_id || !order_response_man || !order_start_time) {
             return message.warning('信息未填写完整！')
         }
@@ -100,7 +107,6 @@ export default function ProductionOrdersAdd(props: any) {
                 ChargeUserId: order_response_man,
                 isUrgent: !order_in_need,
             }).then((res: any) => {
-                console.log(res)
                 if (res.code === 200) {
                     dispatch({
                         type: ACTION_TYPE.SET_ORDERID,
@@ -125,6 +131,19 @@ export default function ProductionOrdersAdd(props: any) {
         }
     }
 
+    const handlePrintBtn = () => {
+        console.log(_state.selectRows)
+        updateIsModalVisible(true)
+    }
+
+    const handleModalOk = () => {
+        updateIsModalVisible(false)
+    }
+
+    const handleModalCancel = () => {
+        updateIsModalVisible(false)
+    }
+
     // 1. prepare work
     // get orderId, set mode type and get user select options
     useEffect(() => {
@@ -140,7 +159,7 @@ export default function ProductionOrdersAdd(props: any) {
                 }
             })
         }
-    }, [])
+    }, [location])
 
     // 2. getdata work
     // if EDIT_MODE, get DeviceList and orderInfo
@@ -237,12 +256,25 @@ export default function ProductionOrdersAdd(props: any) {
                         title="生产订单包含产品"
                         headStyle={{ fontWeight: 'bold' }}
                         bodyStyle={{ padding: 0 }}
-                        extra={<Button type="primary" shape="round" icon={<PlusOutlined />} onClick={add_new_work} disabled={!_state.orderId}>添加新产品</Button>}
+                        extra={
+                            <Space size={16}>
+                                <Button type="primary" shape="round" icon={<PlusOutlined />} onClick={add_new_work} disabled={!_state.orderId}>添加新产品</Button>
+                                <Button style={{ background: '#52c41a', borderColor: '#52c41a' }} type="primary" shape="round" icon={<PrinterOutlined />} onClick={handlePrintBtn} disabled={_state.selectRows.length === 0}>条码打印</Button>
+                            </Space>
+                        }
                     >
                         <Table
                             bordered={true}
                             columns={columns}
                             dataSource={_state.tableData}
+                            rowSelection={{
+                                onChange: (_, selectedRows) => {
+                                    dispatch({
+                                        type: ACTION_TYPE.SET_SELECT_ROWS,
+                                        payload: selectedRows
+                                    })
+                                }
+                            }}
                             rowClassName={(record, index) => {
                                 let className = 'light-row';
                                 if (index % 2 === 1) className = 'dark-row';
@@ -252,6 +284,24 @@ export default function ProductionOrdersAdd(props: any) {
                     </Card>
                 </Card>
             </Space>
+            <Modal title="条码打印队列" visible={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
+                <Carousel>
+                    <div>
+                        <div style={{ height: '160px', background: '#cccccc', display: 'flex', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+                                <div style={{ fontSize: '16px', paddingRight: '10px' }}>打印数量:</div>
+                                <InputNumber min={1} max={10} defaultValue={3} onChange={(value) => {
+                                    console.log(value)
+                                }} />
+                            </div>
+                            {/* 批量打印功能还在开发中... */}
+                            {/* <div className="bar-area">
+                                <canvas ref={refBarContainer} className="barcode-container" />
+                            </div> */}
+                        </div>
+                    </div>
+                </Carousel>
+            </Modal>
         </>
     )
 }

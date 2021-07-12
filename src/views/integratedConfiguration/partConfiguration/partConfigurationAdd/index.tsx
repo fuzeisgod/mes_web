@@ -24,7 +24,7 @@ import { getSearchObj } from '../../../../tools/index'
 import { useDeviceTypes } from '../../../../hooks'
 import { PartTable } from '../../../../components'
 
-export default function PartConfigurationAdd(props) {
+export default function PartConfigurationAdd(props:any) {
     const [form] = Form.useForm()
     const inputRef = useRef(null)
     const [state, dispatch] = useReducer(dataSourceReducer, [])

@@ -40,11 +40,10 @@ const _barcode_options = {
     margin: 25//设置条形码周围的空白边距
 }
 
-export default function ProductionOrdersAddWork(props) {
+export default function ProductionOrdersAddWork(props: any) {
     const [form1] = Form.useForm()
     const [form2] = Form.useForm()
     const refBarContainer = useRef<HTMLCanvasElement>(null)
-    const mainRef = useRef<HTMLDivElement>(null)
     const [isBarcodeExist, setIsBarcodeExist] = useState<boolean>(false)
     const [deviceTypes, updateDeviceTypes] = useDeviceTypes([])
     const [_state, dispatch] = useReducer(productionOrderAddWorkReducer, {
@@ -56,10 +55,13 @@ export default function ProductionOrdersAddWork(props) {
         Id: 0
     })
 
-    const create_barcode = (values) => {
+    // 创建条形码
+    const create_barcode = () => {
+        console.log(_state.typeId)
         let target = null
         if (_state.typeId) {
             getDeviceTypeById(_state.typeId).then((res: any) => {
+                console.log(res)
                 if (res.code === 200) {
                     target = res.data[0] || null
                     let { productId, friendCode } = create_code(target)
@@ -82,6 +84,7 @@ export default function ProductionOrdersAddWork(props) {
         return { productId, friendCode }
     }
 
+    // 打印事件
     const handlePrint = () => {
         // 判断是否生成条码
         if (!isBarcodeExist) {
@@ -222,12 +225,12 @@ export default function ProductionOrdersAddWork(props) {
                             <span className="bread-item" onClick={() => { props.history.go(-1) }}>生产订单编辑</span>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
-                            <span className="bread-item">产品配置</span>
+                            <span className="bread-item">{_state.mode === 0 ? "批次配置" : "产品配置"}</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                 </div>
                 <Card
-                    title="产品配置"
+                    title={_state.mode === 0 ? "批次配置" : "产品配置"}
                     bodyStyle={{ padding: '2px 16px 14px 16px', background: '#fafafa' }}
                     headStyle={{ fontWeight: 'bold' }}
                     extra={
@@ -256,7 +259,7 @@ export default function ProductionOrdersAddWork(props) {
                                         }}
                                     >
 
-                                        <Form.Item label="设备类型" name="TypeId">
+                                        <Form.Item label="产品类型" name="TypeId">
                                             <Select
                                                 style={{ width: '200px' }}
                                                 allowClear
@@ -279,7 +282,7 @@ export default function ProductionOrdersAddWork(props) {
                                             <DatePicker />
                                         </Form.Item>
                                         <Form.Item label="综合方案选择" name="ProgrammeId">
-                                            <Select style={{ width: '250px' }} placeholder="请先选择设备类型" disabled={_state.mode === 0 && !_state.typeId}>
+                                            <Select style={{ width: '250px' }} placeholder="请先选择产品类型" disabled={_state.mode === 0 && !_state.typeId}>
                                                 {
                                                     _state.plans.length > 0 && _state.plans.map((plan) => (
                                                         <Select.Option value={plan.Id} key={plan.Id}>{plan.Name}</Select.Option>
@@ -328,13 +331,12 @@ export default function ProductionOrdersAddWork(props) {
                                 <Card
                                     title="条码生成区"
                                     extra={<Tooltip title="打印条形码" color="#40a9ff"><Button onClick={handlePrint} icon={<PrinterTwoTone />} shape="circle"></Button></Tooltip>}
-                                    bodyStyle={{ minHeight: '150px', padding: 0, overflow: 'hidden', position: 'relative' }}
+                                    bodyStyle={{ height: '150px', padding: 0, overflow: 'hidden', position: 'relative' }}
                                 >
-                                    <div className="bar-area" ref={mainRef}>
+                                    <div className="bar-area">
                                         <canvas ref={refBarContainer} className="barcode-container" />
                                     </div>
                                 </Card>
-
                             </Space>
                         </Col>
                     </Row>

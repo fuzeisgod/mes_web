@@ -21,7 +21,7 @@ import { dataSourceReducer } from './reducer'
 import { ACTION_TYPE } from './typings'
 import { useDeviceTypes } from '../../../hooks'
 
-export default function DeviceConfiguration(props) {
+export default function DeviceConfiguration(props:any) {
     const [form] = Form.useForm()
     const [deviceTypes, updateDeviceTypes] = useDeviceTypes([])
     const [state, dispatch] = useReducer(dataSourceReducer, {

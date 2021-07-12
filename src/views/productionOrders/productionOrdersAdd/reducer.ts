@@ -26,6 +26,8 @@ function productDeviceListReducer(state: IState, action) {
             return _state.set('orderId', payload).toJS()
         case ACTION_TYPE.CHANGE_FRESH_FLAG:
             return _state.set('freshFlag', !_state.get('freshFlag')).toJS()
+        case ACTION_TYPE.SET_SELECT_ROWS:
+            return _state.set('selectRows', payload).toJS()
         default:
             return _state.toJS()
     }

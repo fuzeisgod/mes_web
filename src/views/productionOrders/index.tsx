@@ -24,10 +24,11 @@ import { getProductOrdersList, deleteProductOrder } from '../../api/product'
 import { productOrderListReducer } from './reducer'
 import { ACTION_TYPE } from './typings'
 import { useUsers } from '../../hooks'
+import { KeepAlive } from 'react-activation'
 
 const { RangePicker } = DatePicker
 
-const ProductionOrders: FC = (props: any): ReactElement => {
+const ProductionOrders: FC<any> = (props): ReactElement => {
     const [form] = Form.useForm()
     const [users, updateUsers] = useUsers([])
     const [_state, dispatch] = useReducer(productOrderListReducer, {
@@ -44,9 +45,10 @@ const ProductionOrders: FC = (props: any): ReactElement => {
         freshFlag: false
     })
 
+    console.log(_state)
+
     const onFinish = (values: ISearch) => {
         let { orderNo, chargeUserId, orderTime } = values;
-        console.log(chargeUserId)
         dispatch({
             type: ACTION_TYPE.SET_SEARCH_INFO,
             payload: {

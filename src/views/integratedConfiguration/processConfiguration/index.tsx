@@ -13,7 +13,7 @@ import './process_configuration.less'
 import { getProgrammeList } from '../../../api/integratedconfig'
 import { useDeviceTypes } from '../../../hooks'
 
-export default function ProcessConfiguration(props) {
+export default function ProcessConfiguration(props:any) {
     const [deviceTypes, updateDeviceTypes] = useDeviceTypes([])
     const [typeId, updateTypeId] = useState(null)
     const [programme, updateProgramme] = useState([])

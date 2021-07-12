@@ -14,7 +14,7 @@ import { getBomPropsByTypeId, getMouldByTypeIdAndPositionId, addProgramme, getPr
 import { useDeviceTypes } from '../../../../hooks'
 import { getSearchObj } from '../../../../tools'
 
-const ProcessConfigurationAdd = (props) => {
+const ProcessConfigurationAdd = (props:any) => {
     const [deviceTypes, updateDeviceTypes] = useDeviceTypes([])
     const [boms, updateBoms] = useState([])
     const [products, updateProducts] = useState([])

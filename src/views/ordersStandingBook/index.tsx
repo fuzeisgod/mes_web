@@ -18,7 +18,7 @@ import { PreviewForm } from '../../components'
 
 const { RangePicker } = DatePicker;
 
-export default function OrdersStandingBook() {
+export default function OrdersStandingBook(props: any) {
     const [form] = Form.useForm()
     const [users, updateUsers] = useUsers([])
     const [positions, updatePositions] = usePositions([])

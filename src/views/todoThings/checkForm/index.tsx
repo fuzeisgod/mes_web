@@ -14,7 +14,7 @@ import {
     FilterTwoTone
 } from '@ant-design/icons'
 import moment from 'moment'
-import React from 'react'
+import React, { useState } from 'react'
 import './check_form.less'
 
 const { RangePicker } = DatePicker
@@ -24,7 +24,7 @@ const CheckFormData = [
     { key: '2', check_form_id: 123455, order_number: 'GD202001060001', device_ID: '02020103', device_type: '智能防盗型保护接地箱（直立式）无监测', device_count: 10, response_man: '张三', post_time: '2021-03-12', check_man: '李四', check_time: "2020-03-12", status: '待确认' }
 ]
 
-const CheckForm = (props) => {
+const CheckForm = (props: any) => {
     const columns = [
         { title: '送检单ID', dataIndex: 'check_form_id', key: 'check_form_id', width: 100 },
         { title: '生产订单号', dataIndex: 'order_number', key: 'order_number', width: 150 },
@@ -66,6 +66,8 @@ const CheckForm = (props) => {
         },
     ]
 
+    const [selectedRows, updateSelectedRows] = useState<any[]>([])
+
     const handleCheck = (record) => {
         props.history.push(`/:userID/cf/check/${record.check_form_id}`)
     }
@@ -81,7 +83,7 @@ const CheckForm = (props) => {
                         </Breadcrumb.Item>
                     </Breadcrumb>
                 </div>
-                <Card title="送检单台账" headStyle={{ fontWeight: 'bold' }}>
+                <Card title="送检单台账" headStyle={{ fontWeight: 'bold' }} extra={<Button type="primary" shape="round" disabled={selectedRows.length === 0}>批量送检</Button>}>
                     <Form layout="inline">
                         <Form.Item label="生产订单编号" name="order_num">
                             <Input placeholder="请输入生产订单编号" />
@@ -101,7 +103,19 @@ const CheckForm = (props) => {
                         </Form.Item>
                     </Form>
                     <Divider />
-                    <Table scroll={{ x: 1450 }} bordered columns={columns} dataSource={CheckFormData}></Table>
+                    <Table
+                        scroll={{ x: 1450 }}
+                        bordered
+                        columns={columns}
+                        dataSource={CheckFormData}
+                        rowSelection={{
+                            onChange: (_, selectedRows) => {
+                                console.log(selectedRows)
+                                updateSelectedRows(selectedRows)
+                            }
+                        }}
+                    >
+                    </Table>
                 </Card>
 
             </Space>

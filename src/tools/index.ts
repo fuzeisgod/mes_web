@@ -7,16 +7,19 @@ export const insertUserId = (prevPath: string, userId: string): string => {
     return routeArr.join('/')
 }
 
+// 从url中截取字段
 export const cutURLForSelectedKeys = (url: string): string => {
     let routeArr: Array<string> = url.split('/')
     routeArr.length = 3;
     return routeArr.join('/')
 }
 
+// 判断是否是 iframe 标签
 export const isIFrame = (input: HTMLElement | null): input is HTMLIFrameElement => {
     return input !== null && input.tagName === 'IFRAME';
 }
 
+// 从url中获取字段
 export const getSearchObj = (str: string): { [key: string]: any } => {
     if (!str) return
     let target = {}
@@ -28,6 +31,7 @@ export const getSearchObj = (str: string): { [key: string]: any } => {
     return target
 }
 
+// 整理表格数据格式
 export const getDataSource = (json) => {
     let target = []
     json.forEach((item, index) => {
@@ -62,8 +66,4 @@ export const getDataSource = (json) => {
     })
 
     return target
-}
-
-export const transformBase64ToPicture = (base64Str) => {
-
 }
